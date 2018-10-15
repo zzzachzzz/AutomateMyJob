@@ -13,7 +13,7 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('file:///D:/Users/Zach/Google%20Drive/haha/3OpenText%20Web%20Experience%20Management.htm')
+        self.driver.get('file:///D:/Users/Zach/Google Drive/haha/3OpenText Web Experience Management.htm')
         # self.driver.get('http://automatetheboringstuff.com')
 
     def edit_quick_action(self, q_action):
@@ -21,17 +21,29 @@ class Job:
         # Needs to check quick actions tab is open
         self.e = self.driver.find_element_by_css_selector(qa_targets[q_action])
 
-    def find_marsha(self):  #, marsha):
+    def find_marsha(self, marsha):
         self.tbody = self.driver.find_element_by_css_selector(
                          'div.x-panel.vui-grid.vui-grid-content.vui-picker-grid.x-grid-with-row-lines.x-fit-item.x-panel-default-framed.x-grid'
                      ).find_element_by_css_selector('tbody')
-
         self.get_num_results()
-        start_time = time.clock()
-        for marsha in range(self.results_begin, self.results_end+1):
-            self.e = self.tbody.find_element_by_css_selector('tr:nth-child(' + str(marsha+1) + ') > td:nth-child(2) > div > div')
-            # When found | self.tbody.find_element_by_css_selector('tr:nth-child(' + str(marsha+1) + ') > td:nth-child(1) > div > div').click()
-        print("{}".format(time.clock() - start_time))
+        end = 200 if self.results_end % 200 == 0 else self.results_end % 200
+        self.e = self.tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
+        if marsha <= self.e.text:
+            for i in range(1, end+1):
+                self.e = self.tbody.find_element_by_css_selector('tr:nth-child(' + str(i+1) + ') > td:nth-child(2) > div > div')
+                # return When found | self.tbody.find_element_by_css_selector('tr:nth-child(' + str(marsha+1) + ') > td:nth-child(1) > div > div').click()
+                if self.e.text == marsha:
+                    self.tbody.find_element_by_css_selector('tr:nth-child(' + str(i+1) + ') > td:nth-child(1) > div > div').click()
+                    return self.e.text
+            return None  # Marsha not found
+        else:
+            # Click next page button and check results again
+            self.driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
+            self.find_marsha(marsha)  # Beware unregistered click
+            # Add condition check for last page of results, return None if True
+
+
+
 
     def get_num_results(self):
         results = self.driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
@@ -66,3 +78,7 @@ class Job:
 
 # Used for finding number of results
 # display = job.driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')
+
+# Time it
+# start_time = time.clock()
+# print("{}".format(time.clock() - start_time))
