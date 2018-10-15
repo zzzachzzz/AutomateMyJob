@@ -13,9 +13,17 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('file:///D:/Users/Zach/Google Drive/haha/4OpenText Web Experience Management.htm')
-        #3
-        # self.driver.get('http://automatetheboringstuff.com')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/b/bosbo/IPP 05')
+
+    def login(self):
+        with open('creds.json', 'r') as file:
+            creds = json.load(file)
+        elem = driver.find_element_by_css_selector('#vui-login-name-inputEl')
+        elem.send_keys(creds['user'])
+        elem = driver.find_element_by_css_selector('#vui-login-pass-inputEl')
+        elem.send_keys(creds['pass'])
+        elem = driver.find_element_by_css_selector('#vui-login-link-submit-btnEl')
+        elem.click()
 
     def edit_quick_action(self, q_action):
         qa_targets = {'backlink': '#vui-workspace-drawer-new-quickaction > ul > li:nth-child(1) > div > a'}
@@ -44,9 +52,6 @@ class Job:
             self.driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
             self.find_marsha(marsha)  # Beware unregistered click
             # Add condition check for last page of results, return None if True
-
-
-
 
     def get_num_results(self):
         results = self.driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
