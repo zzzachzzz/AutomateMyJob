@@ -13,13 +13,16 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('file:///D:/Users/Zach/Google Drive/haha/3OpenText Web Experience Management.htm')
+        self.driver.get('file:///D:/Users/Zach/Google Drive/haha/4OpenText Web Experience Management.htm')
+        #3
         # self.driver.get('http://automatetheboringstuff.com')
 
     def edit_quick_action(self, q_action):
         qa_targets = {'backlink': '#vui-workspace-drawer-new-quickaction > ul > li:nth-child(1) > div > a'}
         # Needs to check quick actions tab is open
-        self.e = self.driver.find_element_by_css_selector(qa_targets[q_action])
+        self.e = self.driver.find_element_by_css_selector(qa_targets[q_action]).click()
+        # Edit Quick Action popup window scrolling
+        self.driver.execute_script("arguments[0].scrollTop = arguments[1];", self.driver.find_element_by_id("vui-vcm-quickaction-body"), 500)
 
     def find_marsha(self, marsha):
         self.tbody = self.driver.find_element_by_css_selector(
