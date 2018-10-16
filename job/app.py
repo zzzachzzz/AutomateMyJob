@@ -17,7 +17,7 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('file:///D:/Users/Zach/Google%20Drive/haha/4OpenText%20Web%20Experience%20Management.htm')
+        self.driver.get('file:///D:/Users/Zach/Google%20Drive/haha/3OpenText%20Web%20Experience%20Management.htm')
         self.actionChains = ActionChains(self.driver)
 
     def login(self):
@@ -75,7 +75,7 @@ class Job:
         # If not, navigate to folder
         tbody = self.driver.find_element_by_css_selector(
                          'div.x-panel.vui-grid.vui-grid-content.vui-picker-grid.x-grid-with-row-lines.x-fit-item.x-panel-default-framed.x-grid'
-                     ).find_element_by_css_selector('tbody')
+                     ).find_element_by_tag_name('tbody')
         self.get_num_results()
         end = 200 if self.results_end % 200 == 0 else self.results_end % 200
         e = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
@@ -133,3 +133,10 @@ class Job:
 # Time it
 # start_time = time.clock()
 # print("{}".format(time.clock() - start_time))
+
+# Target Category Tree 
+# '#vui-vcm-ui-picker-1444-category-tree_header-body'
+# x-panel-header-body x-panel-header-body-default x-panel-header-body-horizontal x-panel-header-body-default-horizontal x-panel-header-body-top x-panel-header-body-default-top x-panel-header-body-docked-top x-panel-header-body-default-docked-top x-panel-header-body-default-horizontal x-panel-header-body-default-top x-panel-header-body-default-docked-top x-box-layout-ct
+
+# Tree Node Expanded
+# x-grid-row x-grid-tree-node-expanded
