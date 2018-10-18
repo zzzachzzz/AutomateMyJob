@@ -43,6 +43,7 @@ class Job:
                          '#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a')
             # actionChains.context_click(self.e).move_by_offset(10, -10).perform()
             actionChains.context_click(self.e)
+            # TODO
             # self.e = self.driver.find_element_by_css_selector( Quick Action Context Menu )
             actionChains.click(self.e).perform()
             # Quick Action popup window scrolling
@@ -109,26 +110,7 @@ class Job:
         return self.driver.find_element_by_css_selector(element)
 
 
-# 'Displaying 1 - 200 of 807'
-
 # pprint(dir(e.job))
-
-# 2 - 201 | first - last
-# IMPORTANT. USE FOR FINDING TBODY LIST OF MARSHAS
-"""
->>> e1 = job.driver.find_element_by_css_selector('div.x-panel.vui-grid.vui-grid-content.vui-picker-grid.x-grid-with-row-lines.x-fit-item.x-panel-default-framed.x-grid')
->>> tbody = e1.find_element_by_css_selector('tbody')
->>> tbody.find_element_by_css_selector('tr:nth-child(201) > td:nth-child(2) > div > div').text
-'MCOSI'
->>> tbody.find_element_by_css_selector('tr:nth-child(2) > td:nth-child(2) > div > div').text
-'KMGFI'
->>>
-"""
-
-# x-toolbar-text.x-box-item.x-toolbar-item.x-toolbar-text-default
-
-# Used for finding number of results
-# display = job.driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')
 
 # Time it
 # start_time = time.clock()
@@ -141,11 +123,27 @@ class Job:
 # Tree Node Expanded
 # x-grid-row x-grid-tree-node-expanded
 
-# Quick Action Settings context menu link
-# <a id="menuitem-1193-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on"><img id="menuitem-1193-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-edit"><span id="menuitem-1193-textEl" class="x-menu-item-text">Quick Action Settings...</span><img id="menuitem-1193-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class=""></a>
 
 # Quick Action CONTEXT MENU
-# <div id="menu-1205-innerCt" class="x-box-inner x-vertical-box-overflow-body" role="presentation" style="height: 58px; width: 149px;"><div class="x-menu-icon-separator" id="vext-gen1862" style="height: 58px;">&nbsp;</div><div id="menu-1205-targetEl" style="position:absolute;width:20000px;left:0px;top:0px;height:1px"><div id="menuitem-1203" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 0px; margin: 0px;"><a id="menuitem-1203-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on"><img id="menuitem-1203-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-edit"><span id="menuitem-1203-textEl" class="x-menu-item-text">Quick Action Settings...</span><img id="menuitem-1203-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class=""></a></div><div id="menuitem-1204" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 27px; margin: 0px; width: 149px;"><a id="menuitem-1204-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on"><img id="menuitem-1204-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-delete"><span id="menuitem-1204-textEl" class="x-menu-item-text">Remove Quick Action</span><img id="menuitem-1204-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class=""></a></div></div></div>
+# <div id="menu-1205-innerCt" class="x-box-inner x-vertical-box-overflow-body" role="presentation" style="height: 58px; width: 149px;">
+#   <div class="x-menu-icon-separator" id="vext-gen1862" style="height: 58px;">&nbsp;</div>
+#   <div id="menu-1205-targetEl" style="position:absolute;width:20000px;left:0px;top:0px;height:1px">
+#     <div id="menuitem-1203" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 0px; margin: 0px;">
+#       <a id="menuitem-1203-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on">
+#         <img id="menuitem-1203-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-edit">
+#         <span id="menuitem-1203-textEl" class="x-menu-item-text">Quick Action Settings...</span>
+#         <img id="menuitem-1203-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="">
+#       </a>
+#     </div>
+#     <div id="menuitem-1204" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 27px; margin: 0px; width: 149px;">
+#       <a id="menuitem-1204-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on">
+#         <img id="menuitem-1204-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-delete">
+#         <span id="menuitem-1204-textEl" class="x-menu-item-text">Remove Quick Action</span>
+#         <img id="menuitem-1204-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="">
+#       </a>
+#     </div>
+#   </div>
+# </div>
 
 
 # Parent
