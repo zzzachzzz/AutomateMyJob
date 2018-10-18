@@ -124,6 +124,8 @@ class Job:
 # x-grid-row x-grid-tree-node-expanded
 
 
+# e = self.driver.find_elements_by_xpath('//div[@role="presentation"][@class="x-box-inner x-vertical-box-overflow-body"]') # returns list
+# e.find_elements_by_tag_name('div')[1].find_element_by_css_selector('div > a')
 # Quick Action CONTEXT MENU
 # <div id="menu-1205-innerCt" class="x-box-inner x-vertical-box-overflow-body" role="presentation" style="height: 58px; width: 149px;">
 #   <div class="x-menu-icon-separator" id="vext-gen1862" style="height: 58px;">&nbsp;</div>
@@ -145,7 +147,7 @@ class Job:
 #   </div>
 # </div>
 
-
+# SELECT SIDEBAR FILE NAVIGATION
 # Parent
 # MARSHA CODES (nth-child) 
 # <tr class="x-grid-row x-grid-tree-node-expanded" id="vext-gen3886"><td class="x-grid-cell-treecolumn x-grid-cell x-grid-cell-treecolumn-1716 x-grid-cell-first" id="vext-gen3990"><div class="x-grid-cell-inner " style="text-align: left; ;"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-empty"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-plus x-tree-expander"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-icon x-tree-icon-parent vui-tree-category x-tree-icon x-tree-icon-leaf">MARSHA Codes</div></td></tr>
@@ -154,3 +156,12 @@ class Job:
 
 # Example A (marsha codes > A)
 # <tr id="vext-gen4095" class="x-grid-row x-grid-row-selected x-grid-row-focused"><td class="x-grid-cell-treecolumn x-grid-cell x-grid-cell-treecolumn-1716   x-grid-cell-first"><div class="x-grid-cell-inner " style="text-align: left; ;"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-empty"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-line"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-plus x-tree-expander"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-icon x-tree-icon-parent vui-tree-category x-tree-icon x-tree-icon-leaf">A</div></td></tr>
+
+
+# Getting Sidebar Category Tree
+"""
+>>> e = job.driver.find_elements_by_css_selector('div.x-panel-body.x-grid-body.x-panel-body-default.x-panel-body-default.x-layout-fit')
+>>> e[2].get_attribute('id')
+'vui-vcm-ui-picker-1444-category-tree-body'
+>>>
+"""
