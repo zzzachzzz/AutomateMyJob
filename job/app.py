@@ -165,3 +165,13 @@ class Job:
 'vui-vcm-ui-picker-1444-category-tree-body'
 >>>
 """
+
+# REFRESH BUTTON
+# <div id="button-1028" class="x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-icon x-btn-icon x-btn-default-toolbar-small-icon" style="border-width: 1px; left: 213px; top: 0px; margin: 0px;">
+#   <em id="button-1028-btnWrap">
+#     <button id="button-1028-btnEl" type="button" class="x-btn-center" hidefocus="true" role="button" autocomplete="off" data-qtip="Refresh" style="height: 16px;">
+#       <span id="button-1028-btnInnerEl" class="x-btn-inner" style="">&nbsp;</span>
+#       <span id="button-1028-btnIconEl" class="x-btn-icon x-tbar-loading"></span>
+#     </button>
+#   </em>
+# </div>
