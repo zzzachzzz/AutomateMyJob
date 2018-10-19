@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
 from pprint import pprint
+import json
 import time
 import re
 
@@ -17,18 +18,18 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('file:///D:/Users/Zach/Google%20Drive/haha/3OpenText%20Web%20Experience%20Management.htm')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/d/daldl/IPP01')
         self.actionChains = ActionChains(self.driver)
 
     def login(self):
         with open('creds.json', 'r') as file:
             creds = json.load(file)
-        elem = driver.find_element_by_css_selector('#vui-login-name-inputEl')
-        elem.send_keys(creds['user'])
-        elem = driver.find_element_by_css_selector('#vui-login-pass-inputEl')
-        elem.send_keys(creds['pass'])
-        elem = driver.find_element_by_css_selector('#vui-login-link-submit-btnEl')
-        elem.click()
+        e = self.driver.find_element_by_css_selector('#vui-login-name-inputEl')
+        e.send_keys(creds['user'])
+        e = self.driver.find_element_by_css_selector('#vui-login-pass-inputEl')
+        e.send_keys(creds['pass'])
+        e = self.driver.find_element_by_css_selector('#vui-login-link-submit-btnEl')
+        e.click()
 
     def edit_quick_actions(self):
         # Check if by_id vui-workspace-ribbon-quickaction has class vui-ribbon-selected
@@ -39,13 +40,18 @@ class Job:
         for i in range(1, 13):
             if i in {6, 8, 11}:  # C, D, E articles
                 continue
+            # Wait required for following element to be in the DOM
             self.e = self.driver.find_element_by_css_selector(
-                         '#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a')
-            # actionChains.context_click(self.e).move_by_offset(10, -10).perform()
-            actionChains.context_click(self.e)
+                         '#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
+            # self.actionChains.context_click(self.e).move_by_offset(10, -10).perform()
+            # Possibly not working because mouse isn't hovering over button long enough
+			self.actionChains.context_click(self.e).perform()
+
+            return # interrupt function
+
             # TODO
             # self.e = self.driver.find_element_by_css_selector( Quick Action Context Menu )
-            actionChains.click(self.e).perform()
+            self.actionChains.click(self.e).perform()
             # Quick Action popup window scrolling
             self.driver.execute_script("arguments[0].scrollTop = arguments[1];", self.driver.find_element_by_id("vui-vcm-quickaction-body"), 500)
             # Remove Categories
