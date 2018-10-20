@@ -17,8 +17,8 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        self.driver = webdriver.Firefox()
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/d/daldl/IPP01')
+        self.driver = webdriver.Ie()
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/d/daldl/IPP02')
         self.actionChains = ActionChains(self.driver)
 
     def login(self):
@@ -41,11 +41,10 @@ class Job:
             if i in {6, 8, 11}:  # C, D, E articles
                 continue
             # Wait required for following element to be in the DOM
-            self.e = self.driver.find_element_by_css_selector(
-                         '#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
+            self.e = self.driver.find_element_by_css_selector('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
             # self.actionChains.context_click(self.e).move_by_offset(10, -10).perform()
             # Possibly not working because mouse isn't hovering over button long enough
-			self.actionChains.context_click(self.e).perform()
+            self.actionChains.move_to_element(self.e).context_click(self.e).perform()
 
             return # interrupt function
 
