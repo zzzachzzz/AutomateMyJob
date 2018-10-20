@@ -17,8 +17,8 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        self.driver = webdriver.Ie()
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/d/daldl/IPP02')
+        self.driver = webdriver.Firefox()
+        self.driver.get('https://gojs.net/latest/samples/customContextMenu.html')
         self.actionChains = ActionChains(self.driver)
 
     def login(self):
@@ -30,6 +30,10 @@ class Job:
         e.send_keys(creds['pass'])
         e = self.driver.find_element_by_css_selector('#vui-login-link-submit-btnEl')
         e.click()
+
+    def ok(self):
+        e = self.driver.find_element_by_css_selector('#myDiagramDiv > div')
+        self.actionChains.move_to_element_with_offset(e, 100, 100).context_click().perform()
 
     def edit_quick_actions(self):
         # Check if by_id vui-workspace-ribbon-quickaction has class vui-ribbon-selected
