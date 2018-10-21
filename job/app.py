@@ -1,16 +1,25 @@
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from pprint import pprint
+import logging
 import json
 import time
 import re
 
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+file_handler = logging.FileHandler('tagging_check.log')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+
+
 class Job:
     def __init__(self, marsha='MCOSI', instance='01'):
-        self.driver = None  # Selenium driver
-        self.e = None  # Selected element
         self.marsha = marsha
         self.instance = instance
         self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
@@ -18,47 +27,102 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        self.driver.get('https://gojs.net/latest/samples/customContextMenu.html')
-        self.actionChains = ActionChains(self.driver)
+        # self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
+        self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
 
     def login(self):
         with open('creds.json', 'r') as file:
             creds = json.load(file)
-        e = self.driver.find_element_by_css_selector('#vui-login-name-inputEl')
+        e = self.find_e('#vui-login-name-inputEl')
         e.send_keys(creds['user'])
-        e = self.driver.find_element_by_css_selector('#vui-login-pass-inputEl')
+        e = self.find_e('#vui-login-pass-inputEl')
         e.send_keys(creds['pass'])
-        e = self.driver.find_element_by_css_selector('#vui-login-link-submit-btnEl')
+        e = self.find_e('#vui-login-link-submit-btnEl')
         e.click()
 
+    def verify_tags(self, marsha, instance):
+        e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
+        name = e.text  # System Name
+        e.find_element_by_css_selector('td:nth-child(2) > div > ul > li:nth-child(2)').click()  # Properties button
+        ### Click Categories Tab ####
+        ### Iterate through, checking against acceptable tags ###
+        # for tag in categories #
+
+
+        regex = {
+            'tile':     r'(Type|Tile)[A-Z]',
+            'marsha':   r'^[\s]*[A-Z]{5}[\s]*$',
+            'instance': r'[0-9]{2}',
+
+        }
+
+        mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
+
+        content = {
+            'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'Tier3 Link' },
+            'skittle_meta': { 'regex': r'_meta', 'tag': 'Meta' },
+            'skittle_hero': { 'regex': r'_singleHeroImage', 'tag': 'Meta' },
+            'skittle_B': { 'regex': r'_HotelOverview', 'tag': 'Meta' },
+            'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': 'Meta' },
+            'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': 'Meta' },
+            'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': 'Meta' },
+        }
+        article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
+        wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]'
+        header_C = None  #TITLEA
+        header_E = None  #TITLEA
+
+        for k, v in element_types.items():
+            print(k, v)
+            if re.search(mi + e_regex):
+                if k in {'skittle_meta', 'skittle_hero'}:
+                    if re.search(article, e.text):
+                        pass
+                    elif re.search(wrapper, e.text):
+                        pass
+
+        S = {'YULSA', '04', 'TileB'}  # Expected
+        L = ['MCOSI', '04', 'TileA']  # Actual
+        for x in L:
+            if x not in S:
+                logger.info('Expected {}'.format(x))  # Log the missing tag
+
+        return
+        """
+        >>> e = job.find_e('#gridview-1441 > table > tbody')
+        >>> e.text
+        '  04\n  HotelOverview\n  YULSA'
+        >>> e.text.split()
+        ['04', 'HotelOverview', 'YULSA']
+        """
+
     def ok(self):
-        e = self.driver.find_element_by_css_selector('#myDiagramDiv > div')
-        self.actionChains.move_to_element_with_offset(e, 100, 100).context_click().perform()
+        self.actionChains = ActionChains(self.driver)
+        e = self.find_e('.main > div:nth-child(1) > div:nth-child(4) > center:nth-child(1) > a:nth-child(1)')
+        self.actionChains.context_click(e).perform()
+        # self.actionChains.move_to_element_with_offset(e, 10, 10).context_click().perform()
 
     def edit_quick_actions(self):
-        # Check if by_id vui-workspace-ribbon-quickaction has class vui-ribbon-selected
-        self.e = self.driver.find_element_by_id('vui-workspace-ribbon-quickaction')
-        if not (re.search(r'.*(vui-ribbon-selected).*', self.e.get_attribute('class'))):
-            self.e.click()
-        # don't target li:nth-child(x) where x in { 6, 8, 11 } C, D, E articles
+        # Check if Quick Action bar is expanded (selected)
+        e = self.driver.find_e('#vui-workspace-ribbon-quickaction')
+        if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
+            e.click()
         for i in range(1, 13):
             if i in {6, 8, 11}:  # C, D, E articles
                 continue
-            # Wait required for following element to be in the DOM
-            self.e = self.driver.find_element_by_css_selector('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
-            # self.actionChains.context_click(self.e).move_by_offset(10, -10).perform()
-            # Possibly not working because mouse isn't hovering over button long enough
-            self.actionChains.move_to_element(self.e).context_click(self.e).perform()
+            actionChains = ActionChains(self.driver)
+            e = self.find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
+            actionChains.move_to_element(e).context_click().send_keys(Keys.DOWN, Keys.ENTER).perform()
 
             return # interrupt function
 
             # TODO
-            # self.e = self.driver.find_element_by_css_selector( Quick Action Context Menu )
+            # self.e = self.find_e( Quick Action Context Menu )
             self.actionChains.click(self.e).perform()
             # Quick Action popup window scrolling
-            self.driver.execute_script("arguments[0].scrollTop = arguments[1];", self.driver.find_element_by_id("vui-vcm-quickaction-body"), 500)
+            self.driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 500)
             # Remove Categories
-            categories = self.driver.find_element_by_css_selector(
+            categories = self.find_e(
                              'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item.x-grid-view-default.x-unselectable'
                              ).find_element_by_css_selector('table > tbody'
                              ).find_elements_by_tag_name('tr')  # Last call returns list of elements
@@ -69,11 +133,9 @@ class Job:
                     # Click checkbox for cell removal
                     categories[i].find_element_by_css_selector('td.x-grid-cell-first > div > div').click()
             # Click Remove Categories
-            self.driver.find_element_by_css_selector(
-                '#vui-quickaction-grid-button-category-dissociate-btnEl').click()
+            self.find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
             # Click Add Categories
-            self.driver.find_element_by_css_selector(
-                '#vui-quickaction-grid-button-category-associate-btnEl').click()
+            self.find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
             self.find_marsha()
         # endfor
 
@@ -83,7 +145,7 @@ class Job:
             pass #
         # Check if 'M' folder is selected
         # If not, navigate to folder
-        tbody = self.driver.find_element_by_css_selector(
+        tbody = self.find_e(
                          'div.x-panel.vui-grid.vui-grid-content.vui-picker-grid.x-grid-with-row-lines.x-fit-item.x-panel-default-framed.x-grid'
                      ).find_element_by_tag_name('tbody')
         self.get_num_results()
@@ -114,9 +176,20 @@ class Job:
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
 
-    # Alias method for ease in terminal
-    def find_e(self, element):
-        return self.driver.find_element_by_css_selector(element)
+    def verify_tags(self, marsha, instance):
+        pass
+
+
+    # Alias method for shortened method name
+    def find_e(self, element, by=By.CSS_SELECTOR):
+        # CSS_SELECTOR, XPATH, CLASS_NAME, ID,
+        # LINK_TEXT, NAME, PARTIAL_LINK_TEXT, TAG_NAME
+        if by == By.CSS_SELECTOR:
+            return self.driver.find_element(By.CSS_SELECTOR, element)
+        if by == By.XPATH:
+            return self.driver.find_element(By.XPATH, element)
+        if by == By.CLASS_NAME:
+            return self.driver.find_element(By.CLASS_NAME, element)
 
 
 # pprint(dir(e.job))
@@ -184,3 +257,4 @@ class Job:
 #     </button>
 #   </em>
 # </div>
+
