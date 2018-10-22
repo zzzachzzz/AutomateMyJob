@@ -57,29 +57,33 @@ class Job:
         }
 
         mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
-
         content = {
-            'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'Tier3 Link' },
-            'skittle_meta': { 'regex': r'_meta', 'tag': 'Meta' },
-            'skittle_hero': { 'regex': r'_singleHeroImage', 'tag': 'Meta' },
-            'skittle_B': { 'regex': r'_HotelOverview', 'tag': 'Meta' },
-            'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': 'Meta' },
-            'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': 'Meta' },
-            'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': 'Meta' },
+            'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'textLink' },
+            'skittle_meta': { 'regex': r'_meta', 'tag': 'HotelOverview' },
+            'skittle_hero': { 'regex': r'_singleHeroImage', 'tag': 'singleHeroImage' },
+            'skittle_B': { 'regex': r'_HotelOverview', 'tag': 'HotelOverview' },
+            'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': tile },
+            'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': tile },
+            'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': tile },
         }
         article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
-        wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]'
-        header_C = None  #TITLEA
-        header_E = None  #TITLEA
+        wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]' # 'Tile A'
+        header_C = { 'regex': r'', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
+        header_E = { 'regex': r'', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
 
-        for k, v in element_types.items():
+        for k, v in content.items():
             print(k, v)
-            if re.search(mi + e_regex):
-                if k in {'skittle_meta', 'skittle_hero'}:
-                    if re.search(article, e.text):
-                        pass
-                    elif re.search(wrapper, e.text):
-                        pass
+            if re.search(v['regex']):
+                if k in {'skittle_C', 'skittle_D', 'skittle_E'}:
+                    if re.search(wrapper, e.text):
+                        expected_tags = [v['tag'], marsha, instance]
+                        return expected_tags
+                    elif re.search(article, e.text):
+                        return []  # '(No tags expected)'
+                elif k in {'skittle_B', 'skittle_meta'}:
+                    expected_tags = [v['tag'], marsha, instance]
+                    return expected_tags
+
 
         S = {'YULSA', '04', 'TileB'}  # Expected
         L = ['MCOSI', '04', 'TileA']  # Actual
