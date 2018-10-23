@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from pprint import pprint
@@ -27,8 +28,9 @@ class Job:
     
     def launch(self):
         self.driver = webdriver.Firefox()
-        # self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
-        self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
+        self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
+        # self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/b/bufwi/IPP01')
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -40,10 +42,10 @@ class Job:
         e = self.find_e('#vui-login-link-submit-btnEl')
         e.click()
 
-    def get_expected_tags(self, name):
-        tile = re.search(r'(Tile|Type|TITLE)[A-Z]', name)
+    def get_expected_tags(self, name):  # Returns a set
+        tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name)
         if tile:
-            tile = tile.group()
+            tile = 'Tile ' + tile.group()
         content = {
             'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'textLink' },
             'skittle_meta': { 'regex': r'_meta', 'tag': 'HotelOverview' },
@@ -52,58 +54,76 @@ class Job:
             'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': tile },
             'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': tile },
             'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': tile },
-            'header_C': { 'regex': r'', 'tag': (tile, 'Header')}  # Needs work
-            'header_E': { 'regex': r'', 'tag': (tile, 'Header')}  # Needs work
+            'header_C': { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' },
+            'header_E': { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' },
         }
         mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
         article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
         wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]' # 'Tile A'
-        header_C = { 'regex': r'', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
-        header_E = { 'regex': r'', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
-
+        # header_C = { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
+        # header_E = { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
+        
+        if re.search(r'^(TRASH|ZZTRASH)', name) or re.search(article, name):
+            return set()  # No tags expected
         for k, v in content.items():
-            print(k, v)
-            if re.search(v['regex']):
+            # print(k, v)
+            if re.search(v['regex'], name):
                 if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
-                    return set(v['tag'], marsha, instance)
+                    return set({v['tag'], self.marsha, self.instance})
                 elif k in {'header_C', 'header_E'}:
-                    return set(v['tag'][0], v['tag'][1], marsha, instance)
+                    return set({v['tag'], tile, self.marsha, self.instance})
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
-                    if re.search(wrapper, e.text):
-                        return set(v['tag'], marsha, instance)
-                    elif re.search(article, e.text):
-                        return set()  # '(No tags expected)'
+                    if re.search(wrapper, name):
+                        return set({v['tag'], self.marsha, self.instance})
+        return set()
+                    # elif re.search(article, name):
+                    #     return set()  # No tags expected
 
 
     def verify_tags(self, marsha, instance):
+        self.marsha = marsha
+        self.instance = instance
         # e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len):
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
             name = e.text  # System Name
+            print(name)
             expected_tags = self.get_expected_tags(name)  # Returns set
+            # print(expected_tags)
             e.click()
+            # Menu bar "Overview, Translations, Publishing, Channels, Categories, etc"
+            e = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct')
             ### Click Categories Tab ####
+            categories_tab = e.find_element_by_css_selector('div:nth-child(2) > div > div:nth-child(5) > em > button')
+            categories_tab.click()
+            # wait = WebDriverWait(driver, 5)
+            # wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, '')))
+            time.sleep(3)
+            e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
+            actual_tags = e.text.split()
             ### Iterate through, checking against expected tags ###
             # for tag in categories #
-            e = job.find_e('#gridview-1441 > table > tbody')
-            actual_tags = e.text.split()
-
-            S = {'YULSA', '04', 'TileB'}  # Expected
-            L = ['MCOSI', '04', 'TileA']  # Actual
+            # S = {'YULSA', '04', 'TileB'}  # Expected
+            # L = ['MCOSI', '04', 'TileA']  # Actual
+            print()
+            print("Expected: {}".format(expected_tags))
+            print("Actual: {}".format(actual_tags))
+            print()
+            if len(expected_tags) == 0:
+                print('No tags expected')
+                for tag in actual_tags:
+                    print('!    Found bad tag {}'.format(tag))
+                break
             for tag in actual_tags:
                 if tag not in expected_tags:
-                    logger.info('Expected {}'.format(x))  # Log the missing tag
-
-            return
-            """
-            >>> e = job.find_e('#gridview-1441 > table > tbody')
-            >>> e.text
-            '  04\n  HotelOverview\n  YULSA'
-            >>> e.text.split()
-            ['04', 'HotelOverview', 'YULSA']
-            """
+                    print('{} expected, is missing'.format(tag))
+                    # logger.info('Expected {}'.format(x))  # Log the missing tag
+                else:
+                    print('{} found'.format(tag))
+            self.find_e('img.x-tool-close').click()  # Close popup
+        return
 
     def ok(self):
         self.actionChains = ActionChains(self.driver)
@@ -184,10 +204,6 @@ class Job:
         self.results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())  # 1
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
-
-    def verify_tags(self, marsha, instance):
-        pass
-
 
     # Alias method for shortened method name
     def find_e(self, element, by=By.CSS_SELECTOR):
