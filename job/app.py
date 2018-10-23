@@ -40,23 +40,10 @@ class Job:
         e = self.find_e('#vui-login-link-submit-btnEl')
         e.click()
 
-    def verify_tags(self, marsha, instance):
-        e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
-        name = e.text  # System Name
-        e.find_element_by_css_selector('td:nth-child(2) > div > ul > li:nth-child(2)').click()  # Properties button
-        ### Click Categories Tab ####
-        ### Iterate through, checking against acceptable tags ###
-        # for tag in categories #
-
-
-        regex = {
-            'tile':     r'(Type|Tile)[A-Z]',
-            'marsha':   r'^[\s]*[A-Z]{5}[\s]*$',
-            'instance': r'[0-9]{2}',
-
-        }
-
-        mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
+    def get_expected_tags(self, name):
+        tile = re.search(r'(Tile|Type|TITLE)[A-Z]', name)
+        if tile:
+            tile = tile.group()
         content = {
             'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'textLink' },
             'skittle_meta': { 'regex': r'_meta', 'tag': 'HotelOverview' },
@@ -65,7 +52,10 @@ class Job:
             'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': tile },
             'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': tile },
             'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': tile },
+            'header_C': { 'regex': r'', 'tag': (tile, 'Header')}  # Needs work
+            'header_E': { 'regex': r'', 'tag': (tile, 'Header')}  # Needs work
         }
+        mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
         article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
         wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]' # 'Tile A'
         header_C = { 'regex': r'', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
@@ -74,31 +64,46 @@ class Job:
         for k, v in content.items():
             print(k, v)
             if re.search(v['regex']):
-                if k in {'skittle_C', 'skittle_D', 'skittle_E'}:
+                if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
+                    return set(v['tag'], marsha, instance)
+                elif k in {'header_C', 'header_E'}:
+                    return set(v['tag'][0], v['tag'][1], marsha, instance)
+                elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
                     if re.search(wrapper, e.text):
-                        expected_tags = [v['tag'], marsha, instance]
-                        return expected_tags
+                        return set(v['tag'], marsha, instance)
                     elif re.search(article, e.text):
-                        return []  # '(No tags expected)'
-                elif k in {'skittle_B', 'skittle_meta'}:
-                    expected_tags = [v['tag'], marsha, instance]
-                    return expected_tags
+                        return set()  # '(No tags expected)'
 
 
-        S = {'YULSA', '04', 'TileB'}  # Expected
-        L = ['MCOSI', '04', 'TileA']  # Actual
-        for x in L:
-            if x not in S:
-                logger.info('Expected {}'.format(x))  # Log the missing tag
+    def verify_tags(self, marsha, instance):
+        # e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
+        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
+        for i in range(2, tr_child_len):
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
+            name = e.text  # System Name
+            expected_tags = self.get_expected_tags(name)  # Returns set
+            e.click()
+            ### Click Categories Tab ####
+            ### Iterate through, checking against expected tags ###
+            # for tag in categories #
+            e = job.find_e('#gridview-1441 > table > tbody')
+            actual_tags = e.text.split()
 
-        return
-        """
-        >>> e = job.find_e('#gridview-1441 > table > tbody')
-        >>> e.text
-        '  04\n  HotelOverview\n  YULSA'
-        >>> e.text.split()
-        ['04', 'HotelOverview', 'YULSA']
-        """
+            S = {'YULSA', '04', 'TileB'}  # Expected
+            L = ['MCOSI', '04', 'TileA']  # Actual
+            for tag in actual_tags:
+                if tag not in expected_tags:
+                    logger.info('Expected {}'.format(x))  # Log the missing tag
+
+            return
+            """
+            >>> e = job.find_e('#gridview-1441 > table > tbody')
+            >>> e.text
+            '  04\n  HotelOverview\n  YULSA'
+            >>> e.text.split()
+            ['04', 'HotelOverview', 'YULSA']
+            """
 
     def ok(self):
         self.actionChains = ActionChains(self.driver)
