@@ -8,6 +8,7 @@ import logging
 import json
 import time
 import re
+# import colorama
 
 
 logger = logging.getLogger(__name__)
@@ -26,10 +27,10 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Ie()
         self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
         # self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/b/bufwi/IPP01')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/r/rutlc/IPP01')
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -58,25 +59,25 @@ class Job:
         }
         mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
         article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
-        wrapper = r'(?<!_Articles?[0-9]+)_(Tile|Type)[A-Z]' # 'Tile A'
+        wrapper = r'(?<!_Article[0-9])_(Tile|Type)[A-Z]' # 'Tile A'
         # header_C = { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
         # header_E = { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
         
         if re.search(r'^(TRASH|ZZTRASH)', name) or re.search(article, name):
-            return set()  # No tags expected
+            return []  # No tags expected
         for k, v in content.items():
             # print(k, v)
             if re.search(v['regex'], name):
                 if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
-                    return set({v['tag'], self.marsha, self.instance})
+                    return [v['tag'], self.marsha, self.instance]
                 elif k in {'header_C', 'header_E'}:
-                    return set({v['tag'], tile, self.marsha, self.instance})
+                    return [v['tag'], tile, self.marsha, self.instance]
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
                     if re.search(wrapper, name):
-                        return set({v['tag'], self.marsha, self.instance})
+                        return [v['tag'], self.marsha, self.instance]
                     elif re.search(article, name):
-                        return set()
-        return set()
+                        return []
+        return "Made it through the loop??? Ok"
 
 
     def verify_tags(self, marsha, instance):
@@ -86,8 +87,10 @@ class Job:
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len):
-            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
             name = e.text  # System Name
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
+            print("-------------------------------")
             print(name)
             expected_tags = self.get_expected_tags(name)  # Returns set
             # print(expected_tags)
@@ -103,7 +106,7 @@ class Job:
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
             
             # Old
-            actual_tags = e.text.split()
+            # actual_tags = e.text.split()
             # New
             actual_tags = [s.strip() for s in e.text.split('\n')]
 
@@ -111,22 +114,21 @@ class Job:
             # for tag in categories #
             # S = {'YULSA', '04', 'TileB'}  # Expected
             # L = ['MCOSI', '04', 'TileA']  # Actual
-            print()
             print("Expected: {}".format(expected_tags))
             print("Actual: {}".format(actual_tags))
-            print()
             if len(expected_tags) == 0:
                 print('No tags expected')
                 for tag in actual_tags:
-                    print('!    Found bad tag {}'.format(tag))
-                break
-            for tag in actual_tags:
-                if tag not in expected_tags:
-                    print('{} expected, is missing'.format(tag))
-                    # logger.info('Expected {}'.format(x))  # Log the missing tag
-                else:
-                    print('{} found'.format(tag))
+                    print("Tag should not be present: {}".format(tag))
+            else:
+                for tag in expected_tags:
+                    if tag not in actual_tags:
+                        print('{} expected, is missing'.format(tag))
+                        # logger.info('Expected {}'.format(x))  # Log the missing tag
+                    else:
+                        print('{} found'.format(tag))
             self.find_e('img.x-tool-close').click()  # Close popup
+            print("-------------------------------")
         return
 
     def ok(self):
