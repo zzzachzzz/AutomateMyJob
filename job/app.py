@@ -18,7 +18,6 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
-
 class Job:
     def __init__(self, marsha='MCOSI', instance='01'):
         self.marsha = marsha
@@ -75,9 +74,9 @@ class Job:
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
                     if re.search(wrapper, name):
                         return set({v['tag'], self.marsha, self.instance})
+                    elif re.search(article, name):
+                        return set()
         return set()
-                    # elif re.search(article, name):
-                    #     return set()  # No tags expected
 
 
     def verify_tags(self, marsha, instance):
@@ -102,7 +101,12 @@ class Job:
             # wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, '')))
             time.sleep(3)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
+            
+            # Old
             actual_tags = e.text.split()
+            # New
+            actual_tags = [s.strip() for s in e.text.split('\n')]
+
             ### Iterate through, checking against expected tags ###
             # for tag in categories #
             # S = {'YULSA', '04', 'TileB'}  # Expected
