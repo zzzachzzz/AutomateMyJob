@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from pprint import pprint
+import colorama
+from colorama import Fore, Back, Style
 import logging
 import json
 import time
@@ -24,13 +26,14 @@ class Job:
         self.marsha = marsha
         self.instance = instance
         self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
+        colorama.init(autoreset=True)
         print("Job instance created")
     
     def launch(self):
         self.driver = webdriver.Ie()
         self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
         # self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/r/rutlc/IPP01')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/g/gsosi/IPP02')
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -43,7 +46,7 @@ class Job:
         e.click()
 
     def get_expected_tags(self, name):  # Returns a set
-        tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name)
+        tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name, re.I)
         if tile:
             tile = 'Tile ' + tile.group()
         content = {
@@ -58,26 +61,33 @@ class Job:
             'header_E': { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' },
         }
         mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
-        article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
-        wrapper = r'(?<!_Article[0-9])_(Tile|Type)[A-Z]' # 'Tile A'
+        # article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
+        # article = r'(_Article[0-9]{1,2}_(Tile|Type)[A-Z])|(_(Tile|Type)[A-Z]_Article[0-9]{1,2})')
+        # wrapper = r'((?<!_Article[0-9])_(Tile|Type)[A-Z])|(_(Tile|Type)[A-Z](?!_Article[0-9]))' # 'Tile A'
+        # wrapper = r'(?=(?<!_Article[0-9])_(Tile|Type)[A-Z])(_(Tile|Type)[A-Z](?!_Article[0-9]))' # It works?
         # header_C = { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
         # header_E = { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
+        wrapper_tile = r'_(Tile|Type)[A-Z]'
+        article = r'_Article[0-9]{1,2}'
+
         
-        if re.search(r'^(TRASH|ZZTRASH)', name) or re.search(article, name):
+        if re.search(r'^(TRASH|ZZTRASH)', name, re.I) or re.search(article, name, re.I):
             return []  # No tags expected
         for k, v in content.items():
             # print(k, v)
-            if re.search(v['regex'], name):
+            if re.search(v['regex'], name, re.I):
                 if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
                     return [v['tag'], self.marsha, self.instance]
                 elif k in {'header_C', 'header_E'}:
                     return [v['tag'], tile, self.marsha, self.instance]
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
-                    if re.search(wrapper, name):
-                        return [v['tag'], self.marsha, self.instance]
-                    elif re.search(article, name):
-                        return []
-        return "Made it through the loop??? Ok"
+                    if re.search(wrapper_tile, name, re.I):
+                        if re.search(article, name, re.I):  # Is Article
+                            return []
+                        else:  # Is Wrapper
+                            return [v['tag'], self.marsha, self.instance]
+        print(Back.CYAN+"Made it through the loop??? Ok")
+        return []
 
 
     def verify_tags(self, marsha, instance):
@@ -86,7 +96,7 @@ class Job:
         # e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
-        for i in range(2, tr_child_len):
+        for i in range(2, tr_child_len+1):
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
             name = e.text  # System Name
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
@@ -105,26 +115,28 @@ class Job:
             time.sleep(3)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
             
-            # Old
-            # actual_tags = e.text.split()
-            # New
             actual_tags = [s.strip() for s in e.text.split('\n')]
-
+            actual_tags = list(filter(None, actual_tags))  # Remove empty strings ''
             ### Iterate through, checking against expected tags ###
             # for tag in categories #
             # S = {'YULSA', '04', 'TileB'}  # Expected
             # L = ['MCOSI', '04', 'TileA']  # Actual
+
+            # As sets
+            expected_tags.difference(actual_tags)
+            actual_tags.difference(expected_tags)
+            # As sets
+
             print("Expected: {}".format(expected_tags))
             print("Actual: {}".format(actual_tags))
             if len(expected_tags) == 0:
                 print('No tags expected')
                 for tag in actual_tags:
-                    print("Tag should not be present: {}".format(tag))
+                    print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
             else:
                 for tag in expected_tags:
                     if tag not in actual_tags:
-                        print('{} expected, is missing'.format(tag))
-                        # logger.info('Expected {}'.format(x))  # Log the missing tag
+                        print(Back.RED+Style.BRIGHT+'Tag expected, is missing: {}'.format(tag))
                     else:
                         print('{} found'.format(tag))
             self.find_e('img.x-tool-close').click()  # Close popup
@@ -163,8 +175,8 @@ class Job:
                              ).find_elements_by_tag_name('tr')  # Last call returns list of elements
             for i in range(2, len(categories)):  # First element is a header
                 cell = categories[i].find_element_by_css_selector('td.x-grid-cell-last')
-                if (re.search(r'^[\s]*[A-Z]{5}[\s]*$', cell.text) or  # If a marsha tag
-                    re.search(r'^[\s]*0{1}[0-9]{1}[\s]*$', cell.text)):  # If an instance tag
+                if (re.search(r'^[\s]*[A-Z]{5}[\s]*$', cell.text, re.I) or  # If a marsha tag
+                    re.search(r'^[\s]*0{1}[0-9]{1}[\s]*$', cell.text, re.I)):  # If an instance tag
                     # Click checkbox for cell removal
                     categories[i].find_element_by_css_selector('td.x-grid-cell-first > div > div').click()
             # Click Remove Categories
@@ -289,3 +301,14 @@ class Job:
 #   </em>
 # </div>
 
+"""
+WebElement target = driver.findElement(By.id("myId"));
+((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", target);
+Thread.sleep(500); //not sure why the sleep was needed, but it was needed or it wouldnt work :(
+target.click();
+"""
+"""
+self.driver.execute_script("arguments[0].scrollIntoView(true);", target)
+time.sleep(0.5)
+target.click()
+"""
