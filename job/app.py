@@ -33,7 +33,7 @@ class Job:
         self.driver = webdriver.Ie()
         self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
         # self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/g/gsosi/IPP02')
+        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/s/satlc/IPP02')
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -72,22 +72,22 @@ class Job:
 
         
         if re.search(r'^(TRASH|ZZTRASH)', name, re.I) or re.search(article, name, re.I):
-            return []  # No tags expected
+            return set()  # No tags expected
         for k, v in content.items():
             # print(k, v)
             if re.search(v['regex'], name, re.I):
                 if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
-                    return [v['tag'], self.marsha, self.instance]
+                    return {v['tag'], self.marsha, self.instance}
                 elif k in {'header_C', 'header_E'}:
-                    return [v['tag'], tile, self.marsha, self.instance]
+                    return {v['tag'], tile, self.marsha, self.instance}
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
                     if re.search(wrapper_tile, name, re.I):
                         if re.search(article, name, re.I):  # Is Article
-                            return []
+                            return set()
                         else:  # Is Wrapper
-                            return [v['tag'], self.marsha, self.instance]
+                            return {v['tag'], self.marsha, self.instance}
         print(Back.CYAN+"Made it through the loop??? Ok")
-        return []
+        return set()
 
 
     def verify_tags(self, marsha, instance):
@@ -108,37 +108,43 @@ class Job:
             # Menu bar "Overview, Translations, Publishing, Channels, Categories, etc"
             e = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct')
             ### Click Categories Tab ####
+            time.sleep(0.5)
             categories_tab = e.find_element_by_css_selector('div:nth-child(2) > div > div:nth-child(5) > em > button')
             categories_tab.click()
             # wait = WebDriverWait(driver, 5)
             # wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, '')))
-            time.sleep(3)
+            time.sleep(2.5)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
             
             actual_tags = [s.strip() for s in e.text.split('\n')]
-            actual_tags = list(filter(None, actual_tags))  # Remove empty strings ''
+            # actual_tags = list(filter(None, actual_tags))  # Remove empty strings ''
+            actual_tags = {tag for tag in actual_tags if tag != ''}
             ### Iterate through, checking against expected tags ###
             # for tag in categories #
             # S = {'YULSA', '04', 'TileB'}  # Expected
             # L = ['MCOSI', '04', 'TileA']  # Actual
 
-            # As sets
-            expected_tags.difference(actual_tags)
-            actual_tags.difference(expected_tags)
-            # As sets
 
             print("Expected: {}".format(expected_tags))
             print("Actual: {}".format(actual_tags))
-            if len(expected_tags) == 0:
-                print('No tags expected')
-                for tag in actual_tags:
-                    print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
-            else:
-                for tag in expected_tags:
-                    if tag not in actual_tags:
-                        print(Back.RED+Style.BRIGHT+'Tag expected, is missing: {}'.format(tag))
-                    else:
-                        print('{} found'.format(tag))
+
+            for tag in expected_tags.difference(actual_tags):
+                print(Back.RED+Style.BRIGHT+'Tag expected, is missing: {}'.format(tag))
+
+            for tag in actual_tags.difference(expected_tags):
+                print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
+
+            
+            # if len(expected_tags) == 0:
+            #     print('No tags expected')
+            #     for tag in actual_tags:
+            #         print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
+            # else:
+            #     for tag in expected_tags:
+            #         if tag not in actual_tags:
+            #             print(Back.RED+Style.BRIGHT+'Tag expected, is missing: {}'.format(tag))
+            #         else:
+            #             print('{} found'.format(tag))
             self.find_e('img.x-tool-close').click()  # Close popup
             print("-------------------------------")
         return
