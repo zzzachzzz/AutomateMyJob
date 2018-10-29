@@ -97,7 +97,8 @@ class Job:
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
-            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
+            # Click on row before clicking on properties button to avoid unregistered clicks when out of view
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div').click()
             name = e.text  # System Name
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
             print("-------------------------------")
@@ -116,7 +117,7 @@ class Job:
             time.sleep(2.5)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
             
-            actual_tags = [s.strip() for s in e.text.split('\n')]
+            actual_tags = {s.strip() for s in e.text.split('\n')}
             # actual_tags = list(filter(None, actual_tags))  # Remove empty strings ''
             actual_tags = {tag for tag in actual_tags if tag != ''}
             ### Iterate through, checking against expected tags ###
