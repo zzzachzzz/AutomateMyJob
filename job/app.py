@@ -10,7 +10,6 @@ import logging
 import json
 import time
 import re
-# import colorama
 
 
 logger = logging.getLogger(__name__)
@@ -19,6 +18,26 @@ formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
 file_handler = logging.FileHandler('tagging_check.log')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
+
+
+class Components:
+    content = {
+        'skittle_backlink': { 'regex': r'_backToParentLink|Link', 'tag': 'textLink' },
+        'skittle_meta': { 'regex': r'_meta', 'tag': 'HotelOverview' },
+        'skittle_hero': { 'regex': r'_singleHeroImage', 'tag': 'singleHeroImage' },
+        'skittle_B': { 'regex': r'_HotelOverview', 'tag': 'HotelOverview' },
+        'skittle_C': { 'regex': r'_headingTextListOfArticles' },
+        'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced' },
+        'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)' },
+        'header_C': { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' },
+        'header_E': { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' },
+    }
+    wrapper_tile = r'_(Tile|Type)[A-Z]'
+    article = r'_Article[0-9]{1,2}'
+    trash = r'^(TRASH|ZZTRASH)'
+    mi = r'[A-Z]{5}_IPP[0-9]{2}'
+
+C = Components  # Alias, shortened "import" name
 
 
 class Job:
@@ -30,10 +49,10 @@ class Job:
         print("Job instance created")
     
     def launch(self):
+        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/y/yyzwi/IPP 01'
         self.driver = webdriver.Ie()
-        self.driver.implicitly_wait(120)  # Waits 2 minutes before throwing exception
-        # self.driver.get('file:///D:/Users/Zach/Desktop/haha/2OpenText%20Web%20Experience%20Management.htm')
-        self.driver.get('http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/s/satlc/IPP02')
+        self.driver.implicitly_wait(60)  # Waits 1 minute before throwing exception
+        self.driver.get(url)
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -49,31 +68,9 @@ class Job:
         tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name, re.I)
         if tile:
             tile = 'Tile ' + tile.group()
-        content = {
-            'skittle_backlink': { 'regex': r'_backToParentLink', 'tag': 'textLink' },
-            'skittle_meta': { 'regex': r'_meta', 'tag': 'HotelOverview' },
-            'skittle_hero': { 'regex': r'_singleHeroImage', 'tag': 'singleHeroImage' },
-            'skittle_B': { 'regex': r'_HotelOverview', 'tag': 'HotelOverview' },
-            'skittle_C': { 'regex': r'_headingTextListOfArticles', 'tag': tile },
-            'skittle_D': { 'regex': r'_imageHeaderTextCtaAdvanced', 'tag': tile },
-            'skittle_E': { 'regex': r'_imageHeaderTextCta(?!Advanced)', 'tag': tile },
-            'header_C': { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' },
-            'header_E': { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' },
-        }
-        mi = r'[A-Z]{5}_IPP[0-9]{2}'  # marsha_and_instance
-        # article = r'_Article[0-9]{1,2}_(Tile|Type)[A-Z]'
-        # article = r'(_Article[0-9]{1,2}_(Tile|Type)[A-Z])|(_(Tile|Type)[A-Z]_Article[0-9]{1,2})')
-        # wrapper = r'((?<!_Article[0-9])_(Tile|Type)[A-Z])|(_(Tile|Type)[A-Z](?!_Article[0-9]))' # 'Tile A'
-        # wrapper = r'(?=(?<!_Article[0-9])_(Tile|Type)[A-Z])(_(Tile|Type)[A-Z](?!_Article[0-9]))' # It works?
-        # header_C = { 'regex': r'_headingTextListOfArticles_TITLE[A-Z]', 'tag': 'Header' }  #TITLEA & tag 'Tile A'
-        # header_E = { 'regex': r'_imageHeaderTextCta_TITLE[A-Z]', 'tag': 'Header' }  #TITLE & tag 'imageHeaderTextCta'
-        wrapper_tile = r'_(Tile|Type)[A-Z]'
-        article = r'_Article[0-9]{1,2}'
-
-        
-        if re.search(r'^(TRASH|ZZTRASH)', name, re.I) or re.search(article, name, re.I):
+        if re.search(C.trash, name, re.I) or re.search(C.article, name, re.I):
             return set()  # No tags expected
-        for k, v in content.items():
+        for k, v in C.content.items():
             # print(k, v)
             if re.search(v['regex'], name, re.I):
                 if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero', 'skittle_B'}:
@@ -81,13 +78,54 @@ class Job:
                 elif k in {'header_C', 'header_E'}:
                     return {v['tag'], tile, self.marsha, self.instance}
                 elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
-                    if re.search(wrapper_tile, name, re.I):
-                        if re.search(article, name, re.I):  # Is Article
+                    if re.search(C.wrapper_tile, name, re.I):
+                        if re.search(C.article, name, re.I):  # Is Article
                             return set()
                         else:  # Is Wrapper
                             return {v['tag'], self.marsha, self.instance}
         print(Back.CYAN+"Made it through the loop??? Ok")
         return set()
+
+
+    def has_general_description(self, name):
+        if re.search(C.trash, name, re.I):
+            return False
+        for k, v in C.content.items():
+            if re.search(v['regex'], name, re.I):
+                if k in {'skittle_backlink', 'skittle_meta', 'skittle_hero'}:
+                    return False
+                elif k in {'skittle_B', 'header_C', 'header_E'}:
+                    return True
+                elif k in {'skittle_C', 'skittle_D', 'skittle_E'}:
+                    if re.search(C.article, name, re.I) and re.search(C.wrapper_tile, name, re.I):
+                        return True
+                    return False
+        print(Back.CYAN+"Made it through the loop??? Ok")
+
+
+    def check_formatting(self):
+        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
+        for i in range(2, tr_child_len+1):
+            # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
+            name = e.text
+            if self.has_general_description(name):
+                e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
+                e.click()
+                time.sleep(3)
+                self.driver.switch_to.frame(self.find_e('iframe'))
+                e = self.find_e('html > body > textarea')
+                text = e.text
+                self.driver.switch_to.default_content()
+                self.find_e('img.x-tool-close').click()  # Close popup
+                # e = self.find_e('#vui-view-contentitem-closeButton-btnInnerEl')
+                if re.search(r'font', text):
+                    print(Back.RED+Style.BRIGHT+"Formatting found on {}".format(name))
+                else:
+                    print("{} is clear of formatting".format(name))
+            else:
+                print(Back.CYAN+"No general description  for {}".format(name))
 
 
     def verify_tags(self, marsha, instance):
@@ -98,7 +136,8 @@ class Job:
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             # Click on row before clicking on properties button to avoid unregistered clicks when out of view
-            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div').click()
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
+            e.click()
             name = e.text  # System Name
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
             print("-------------------------------")
@@ -135,17 +174,6 @@ class Job:
             for tag in actual_tags.difference(expected_tags):
                 print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
 
-            
-            # if len(expected_tags) == 0:
-            #     print('No tags expected')
-            #     for tag in actual_tags:
-            #         print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
-            # else:
-            #     for tag in expected_tags:
-            #         if tag not in actual_tags:
-            #             print(Back.RED+Style.BRIGHT+'Tag expected, is missing: {}'.format(tag))
-            #         else:
-            #             print('{} found'.format(tag))
             self.find_e('img.x-tool-close').click()  # Close popup
             print("-------------------------------")
         return
