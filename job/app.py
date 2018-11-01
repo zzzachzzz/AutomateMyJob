@@ -82,7 +82,7 @@ class Job:
                         if re.search(C.article, name, re.I):  # Is Article
                             return set()
                         else:  # Is Wrapper
-                            return {v['tag'], self.marsha, self.instance}
+                            return {tile, self.marsha, self.instance}
         print(Back.CYAN+"Made it through the loop??? Ok")
         return set()
 
