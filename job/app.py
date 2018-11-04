@@ -49,9 +49,9 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/y/yyzwi/IPP 01'
+        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/m/myrsi/IPP03'
         self.driver = webdriver.Ie()
-        self.driver.implicitly_wait(60)  # Waits 1 minute before throwing exception
+        self.driver.implicitly_wait(15)  # Waits 15 seconds before throwing exception
         self.driver.get(url)
 
     def login(self):
@@ -107,23 +107,23 @@ class Job:
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
-            # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
             name = e.text
+            e.click()
             if self.has_general_description(name):
                 e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
-                e.click()
+                ac = ActionChains(self.driver)
+                ac.move_to_element(e).click().perform()
                 time.sleep(3)
                 self.driver.switch_to.frame(self.find_e('iframe'))
                 e = self.find_e('html > body > textarea')
                 text = e.text
                 self.driver.switch_to.default_content()
-                self.find_e('img.x-tool-close').click()  # Close popup
-                # e = self.find_e('#vui-view-contentitem-closeButton-btnInnerEl')
+                self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
                 if re.search(r'font', text):
                     print(Back.RED+Style.BRIGHT+"Formatting found on {}".format(name))
                 else:
-                    print("{} is clear of formatting".format(name))
+                    print(Back.CYAN+"{} is clear of formatting".format(name))
             else:
                 print(Back.CYAN+"No general description  for {}".format(name))
 
@@ -140,6 +140,8 @@ class Job:
             e.click()
             name = e.text  # System Name
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
+            ac = ActionChains(self.driver)
+            ac.move_to_element(e).click().perform()
             print("-------------------------------")
             print(name)
             expected_tags = self.get_expected_tags(name)  # Returns set
@@ -151,19 +153,11 @@ class Job:
             time.sleep(0.5)
             categories_tab = e.find_element_by_css_selector('div:nth-child(2) > div > div:nth-child(5) > em > button')
             categories_tab.click()
-            # wait = WebDriverWait(driver, 5)
-            # wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, '')))
             time.sleep(2.5)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
             
             actual_tags = {s.strip() for s in e.text.split('\n')}
-            # actual_tags = list(filter(None, actual_tags))  # Remove empty strings ''
             actual_tags = {tag for tag in actual_tags if tag != ''}
-            ### Iterate through, checking against expected tags ###
-            # for tag in categories #
-            # S = {'YULSA', '04', 'TileB'}  # Expected
-            # L = ['MCOSI', '04', 'TileA']  # Actual
-
 
             print("Expected: {}".format(expected_tags))
             print("Actual: {}".format(actual_tags))
@@ -268,82 +262,3 @@ class Job:
             return self.driver.find_element(By.XPATH, element)
         if by == By.CLASS_NAME:
             return self.driver.find_element(By.CLASS_NAME, element)
-
-
-# pprint(dir(e.job))
-
-# Time it
-# start_time = time.clock()
-# print("{}".format(time.clock() - start_time))
-
-# Target Category Tree 
-# '#vui-vcm-ui-picker-1444-category-tree_header-body'
-# x-panel-header-body x-panel-header-body-default x-panel-header-body-horizontal x-panel-header-body-default-horizontal x-panel-header-body-top x-panel-header-body-default-top x-panel-header-body-docked-top x-panel-header-body-default-docked-top x-panel-header-body-default-horizontal x-panel-header-body-default-top x-panel-header-body-default-docked-top x-box-layout-ct
-
-# Tree Node Expanded
-# x-grid-row x-grid-tree-node-expanded
-
-
-# e = self.driver.find_elements_by_xpath('//div[@role="presentation"][@class="x-box-inner x-vertical-box-overflow-body"]') # returns list
-# e.find_elements_by_tag_name('div')[1].find_element_by_css_selector('div > a')
-# Quick Action CONTEXT MENU
-# <div id="menu-1205-innerCt" class="x-box-inner x-vertical-box-overflow-body" role="presentation" style="height: 58px; width: 149px;">
-#   <div class="x-menu-icon-separator" id="vext-gen1862" style="height: 58px;">&nbsp;</div>
-#   <div id="menu-1205-targetEl" style="position:absolute;width:20000px;left:0px;top:0px;height:1px">
-#     <div id="menuitem-1203" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 0px; margin: 0px;">
-#       <a id="menuitem-1203-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on">
-#         <img id="menuitem-1203-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-edit">
-#         <span id="menuitem-1203-textEl" class="x-menu-item-text">Quick Action Settings...</span>
-#         <img id="menuitem-1203-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="">
-#       </a>
-#     </div>
-#     <div id="menuitem-1204" class="x-component x-box-item x-component-default x-menu-item" style="left: 0px; top: 27px; margin: 0px; width: 149px;">
-#       <a id="menuitem-1204-itemEl" class="x-menu-item-link" href="#" hidefocus="true" unselectable="on">
-#         <img id="menuitem-1204-iconEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-menu-item-icon vui-drawer-contextmenu-delete">
-#         <span id="menuitem-1204-textEl" class="x-menu-item-text">Remove Quick Action</span>
-#         <img id="menuitem-1204-arrowEl" src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="">
-#       </a>
-#     </div>
-#   </div>
-# </div>
-
-# SELECT SIDEBAR FILE NAVIGATION
-# Parent
-# MARSHA CODES (nth-child) 
-# <tr class="x-grid-row x-grid-tree-node-expanded" id="vext-gen3886"><td class="x-grid-cell-treecolumn x-grid-cell x-grid-cell-treecolumn-1716 x-grid-cell-first" id="vext-gen3990"><div class="x-grid-cell-inner " style="text-align: left; ;"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-empty"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-plus x-tree-expander"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-icon x-tree-icon-parent vui-tree-category x-tree-icon x-tree-icon-leaf">MARSHA Codes</div></td></tr>
-# Upon expanding, folders are inserted into the dom as sibling???
-# id 4000+ right after expanded folder
-
-# Example A (marsha codes > A)
-# <tr id="vext-gen4095" class="x-grid-row x-grid-row-selected x-grid-row-focused"><td class="x-grid-cell-treecolumn x-grid-cell x-grid-cell-treecolumn-1716   x-grid-cell-first"><div class="x-grid-cell-inner " style="text-align: left; ;"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-empty"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-line"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-elbow-plus x-tree-expander"><img src="data:image/gif;base64,R0lGODlhAQABAID/AMDAwAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" class="x-tree-icon x-tree-icon-parent vui-tree-category x-tree-icon x-tree-icon-leaf">A</div></td></tr>
-
-
-# Getting Sidebar Category Tree
-"""
->>> e = job.driver.find_elements_by_css_selector('div.x-panel-body.x-grid-body.x-panel-body-default.x-panel-body-default.x-layout-fit')
->>> e[2].get_attribute('id')
-'vui-vcm-ui-picker-1444-category-tree-body'
->>>
-"""
-
-# REFRESH BUTTON
-# <div id="button-1028" class="x-btn x-box-item x-toolbar-item x-btn-default-toolbar-small x-icon x-btn-icon x-btn-default-toolbar-small-icon" style="border-width: 1px; left: 213px; top: 0px; margin: 0px;">
-#   <em id="button-1028-btnWrap">
-#     <button id="button-1028-btnEl" type="button" class="x-btn-center" hidefocus="true" role="button" autocomplete="off" data-qtip="Refresh" style="height: 16px;">
-#       <span id="button-1028-btnInnerEl" class="x-btn-inner" style="">&nbsp;</span>
-#       <span id="button-1028-btnIconEl" class="x-btn-icon x-tbar-loading"></span>
-#     </button>
-#   </em>
-# </div>
-
-"""
-WebElement target = driver.findElement(By.id("myId"));
-((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", target);
-Thread.sleep(500); //not sure why the sleep was needed, but it was needed or it wouldnt work :(
-target.click();
-"""
-"""
-self.driver.execute_script("arguments[0].scrollIntoView(true);", target)
-time.sleep(0.5)
-target.click()
-"""
