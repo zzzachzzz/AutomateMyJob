@@ -49,9 +49,9 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/m/myrsi/IPP03'
+        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/b/bursi/IPP03'
         self.driver = webdriver.Ie()
-        self.driver.implicitly_wait(15)  # Waits 15 seconds before throwing exception
+        self.driver.implicitly_wait(30)  # Waits 30 seconds before throwing exception
         self.driver.get(url)
 
     def login(self):
@@ -111,10 +111,9 @@ class Job:
             name = e.text
             e.click()
             if self.has_general_description(name):
+                time.sleep(2)
                 e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
-                ac = ActionChains(self.driver)
-                ac.move_to_element(e).click().perform()
-                time.sleep(3)
+                e.click()
                 self.driver.switch_to.frame(self.find_e('iframe'))
                 e = self.find_e('html > body > textarea')
                 text = e.text
@@ -128,7 +127,7 @@ class Job:
                 print(Back.CYAN+"No general description  for {}".format(name))
 
 
-    def verify_tags(self, marsha, instance):
+    def check_tags(self, marsha, instance):
         self.marsha = marsha
         self.instance = instance
         # e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
@@ -139,19 +138,18 @@ class Job:
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
             e.click()
             name = e.text  # System Name
+            time.sleep(2)
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
-            ac = ActionChains(self.driver)
-            ac.move_to_element(e).click().perform()
+            e.click()
             print("-------------------------------")
             print(name)
             expected_tags = self.get_expected_tags(name)  # Returns set
             # print(expected_tags)
             e.click()
+            time.sleep(2.5)
             # Menu bar "Overview, Translations, Publishing, Channels, Categories, etc"
-            e = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct')
-            ### Click Categories Tab ####
-            time.sleep(0.5)
-            categories_tab = e.find_element_by_css_selector('div:nth-child(2) > div > div:nth-child(5) > em > button')
+            categories_tab = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct'
+                                         + ' > div:nth-child(2) > div > div:nth-child(5) > em > button')
             categories_tab.click()
             time.sleep(2.5)
             e = self.driver.find_elements_by_xpath('//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')[1]
@@ -172,11 +170,6 @@ class Job:
             print("-------------------------------")
         return
 
-    def ok(self):
-        self.actionChains = ActionChains(self.driver)
-        e = self.find_e('.main > div:nth-child(1) > div:nth-child(4) > center:nth-child(1) > a:nth-child(1)')
-        self.actionChains.context_click(e).perform()
-        # self.actionChains.move_to_element_with_offset(e, 10, 10).context_click().perform()
 
     def edit_quick_actions(self):
         # Check if Quick Action bar is expanded (selected)
