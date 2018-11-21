@@ -49,7 +49,7 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/a/asemw/IPP01'
+        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/c/cmhcs/IPP03'
         self.driver = webdriver.Ie()
         self.driver.implicitly_wait(20)  # Waits 20 seconds before throwing exception
         self.driver.get(url)
@@ -63,6 +63,27 @@ class Job:
         e.send_keys(creds['pass'])
         e = self.find_e('#vui-login-link-submit-btnEl')
         e.click()
+
+    def get_vcmid(self):
+        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
+        for i in range(2, tr_child_len+1):
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
+            name = e.text
+            if re.search(C.trash, name, re.I):
+                continue
+            print(Back.CYAN + name)
+            e.click()
+            time.sleep(2)
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
+            e.click()
+            time.sleep(2)
+            self.driver.switch_to.frame(self.find_e('iframe'))
+            e = self.find_e('html > body > textarea')
+            text = e.text
+            self.driver.switch_to.default_content()
+            self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
+            print(Back.CYAN + re.search(r'(?<=<VignVCMId>).*(?=</VignVCMId)', text).group())
 
     # For fixing "stale" content
     def stale(self):
