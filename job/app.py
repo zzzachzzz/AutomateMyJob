@@ -49,9 +49,9 @@ class Job:
         print("Job instance created")
     
     def launch(self):
-        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/b/bursi/IPP03'
+        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/a/asemw/IPP01'
         self.driver = webdriver.Ie()
-        self.driver.implicitly_wait(30)  # Waits 30 seconds before throwing exception
+        self.driver.implicitly_wait(20)  # Waits 20 seconds before throwing exception
         self.driver.get(url)
 
     def login(self):
@@ -63,6 +63,31 @@ class Job:
         e.send_keys(creds['pass'])
         e = self.find_e('#vui-login-link-submit-btnEl')
         e.click()
+
+    # For fixing "stale" content
+    def stale(self):
+        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
+        for i in range(2, tr_child_len+1):
+            tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
+            e.click()
+            time.sleep(1)
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
+            e.click()
+            time.sleep(7)
+            e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+            e = e.find_element_by_tag_name('input')
+            e.send_keys('x')
+            e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
+            e.click()
+            time.sleep(6)
+            e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+            e = e.find_element_by_tag_name('input')
+            e.send_keys(Keys.BACKSPACE)
+            e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
+            e.click()
+            time.sleep(4)
 
     def get_expected_tags(self, name):  # Returns a set
         tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name, re.I)
