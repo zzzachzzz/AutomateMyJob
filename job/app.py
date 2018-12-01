@@ -254,17 +254,24 @@ class Job:
 
     def edit_quick_actions(self):
         # Check if Quick Action bar is expanded (selected)
-        e = self.driver.find_e('#vui-workspace-ribbon-quickaction')
+        e = self.find_e('#vui-workspace-ribbon-quickaction')
         if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
             e.click()
-        for i in range(1, 13):
-            if i in {6, 8, 11}:  # C, D, E articles
-                continue
-            actionChains = ActionChains(self.driver)
-            e = self.find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+ str(i) +') > div > a > span')
-            actionChains.move_to_element(e).context_click().send_keys(Keys.DOWN, Keys.ENTER).perform()
+        all_quick_actions = self.find_e('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
+        indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
 
-            return # interrupt function
+        for i in indices_of_qa_to_edit:
+            # Scroll to quick action, right click it, and select first option with KeyDown and Enter
+            e = self.find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(i)+')')
+            self.driver.execute_script("arguments[0].scrollIntoView(true);", e)
+            ActionChains(self.driver).context_click(e).perform()
+            time.sleep(0.5)
+            ActionChains(self.driver).send_keys(Keys.DOWN, Keys.ENTER).perform()
+            # End of block
+            
+
+
+
 
             # TODO
             # self.e = self.find_e( Quick Action Context Menu )
