@@ -1,8 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from pprint import pprint
 import colorama
 from colorama import Fore, Back, Style
@@ -102,25 +102,25 @@ class Job:
         tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
-            tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
-            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
-            e.click()
-            # time.sleep(1)
+            # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+            tbody = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
             e.click()
-            # time.sleep(7)
+            e = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default') ))
             e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys('x')
             e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
             e.click()
-            # time.sleep(6)
+            # Wait for reload caused by clicking Save
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
+            time.sleep(2)
+            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys(Keys.BACKSPACE)
-            e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
+            e = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             e.click()
-            # time.sleep(4)
 
     # Future
     def translate(self):
@@ -220,7 +220,7 @@ class Job:
         for i in range(2, tr_child_len+1):
             # Click on row before clicking on properties button to avoid unregistered clicks when out of view
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
-            e.click()
+            # e.click()
             name = e.text  # System Name
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(2)')  # Properties button
             e.click()
