@@ -19,16 +19,6 @@ file_handler = logging.FileHandler('tagging_check.log')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-def suppress_KeyboardInterrupt(func):
-    def wrapper(self):
-        try:
-            print("Before execution")
-            func(self)
-            print("After execution")
-        except KeyboardInterrupt:
-            print("Interrupted")
-    return wrapper
-
 
 class Components:
     content = {
