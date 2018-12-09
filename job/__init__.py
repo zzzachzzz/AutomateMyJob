@@ -18,7 +18,7 @@ wait = webdriver.support.ui.WebDriverWait(driver, 10)
 from . import job
 from . import build
 j = job.Job()
-b = build.B()
+b = build.Build()
 marsha, instance = 'sfonw', '02'
 url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/' + \
        marsha.lower()[0]+'/'+marsha.lower()+'/IPP'+instance
