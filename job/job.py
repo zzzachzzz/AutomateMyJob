@@ -11,6 +11,7 @@ import json
 import time
 import re
 
+from . import driver, wait
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -41,20 +42,18 @@ C = Components  # Alias, shortened "import" name
 
 
 class Job:
-    def __init__(self, marsha='sfonw', instance='2'):
-        self.marsha = marsha.upper()
-        self.instance = '0' + instance[-1]
-        self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
+    def __init__(self):
+        # self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
         colorama.init(autoreset=True)
         print("Job instance created")
     
     def launch(self):
         url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/' + \
                self.marsha.lower()[0]+'/'+self.marsha.lower()+'/IPP'+self.instance
-        self.driver = webdriver.Ie()
-        # self.driver.implicitly_wait(10)
-        self.wait = webdriver.support.ui.WebDriverWait(self.driver, 10)
-        self.driver.get(url)
+        driver = webdriver.Chrome()
+        # driver.implicitly_wait(10)
+        wait = webdriver.support.ui.WebDriverWait(driver, 10)
+        driver.get(url)
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -80,10 +79,12 @@ class Job:
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
             e.click()
             # time.sleep(2)
-            self.wait.until(EC.frame_to_be_available_and_switch_to_it(self.find_e('iframe')))
-            e = self.find_e('html > body > textarea')
+            # wait.until(EC.frame_to_be_available_and_switch_to_it(self.find_e('iframe')))
+            driver.switch_to.frame(
+                    wait.until(EC.presence_of_element_located((By.TAG_NAME,'iframe') )))
+            e = self.find_e_wait('html > body > textarea')
             text = e.text
-            self.driver.switch_to.default_content()
+            driver.switch_to.default_content()
             self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
             print(Back.CYAN + re.search(r'(?<=<VignVCMId>).*(?=</VignVCMId)', text).group())
 
@@ -93,23 +94,23 @@ class Job:
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
-            tbody = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
+            tbody = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
             e.click()
-            e = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default') ))
+            e = self.find_e_wait('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys('x')
-            e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
+            e = driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
             e.click()
             # Wait for reload caused by clicking Save
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
+            wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             time.sleep(2)
-            self.wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
+            wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys(Keys.BACKSPACE)
-            e = self.wait.until(EC.visibility_of_element_located((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
+            e = wait.until(EC.visibility_of_element_located((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             e.click()
 
     # Future
@@ -127,16 +128,16 @@ class Job:
         #     e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(1) > div > div')  # Checkbox
         #     e.click()  # Click Checkbox
 
-        # self.driver.find_element_by_id('vui-wizard-startworkflow-name-input').send_keys('wow')
+        # driver.find_element_by_id('vui-wizard-startworkflow-name-input').send_keys('wow')
         # e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
         # e = e.find_element_by_tag_name('input')
         # e.send_keys('x')
-        # e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
+        # e = driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
         # e.click()
         # e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
         # e = e.find_element_by_tag_name('input')
         # e.send_keys(Keys.BACKSPACE)
-        # e = self.driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
+        # e = driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
         # e.click()
 
     def get_expected_tags(self, name):  # Returns a set
@@ -188,10 +189,10 @@ class Job:
             if self.has_general_description(name):
                 e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
                 e.click()
-                self.driver.switch_to.frame(
-                        self.wait.until(EC.presence_of_element_located((By.TAG_NAME,'iframe') )))
-                text = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR ,'html > body > textarea'))).text
-                self.driver.switch_to.default_content()
+                driver.switch_to.frame(
+                        wait.until(EC.presence_of_element_located((By.TAG_NAME,'iframe') )))
+                text = self.find_e_wait('html > body > textarea').text
+                driver.switch_to.default_content()
                 self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
                 if re.search(r'font', text):
                     print(Back.RED+Style.BRIGHT+"Formatting found on {}".format(name))
@@ -222,7 +223,7 @@ class Job:
             categories_tab = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct'
                                          + ' > div:nth-child(2) > div > div:nth-child(5) > em > button')
             categories_tab.click()
-            e = self.wait.until(EC.presence_of_all_elements_located(
+            e = wait.until(EC.presence_of_all_elements_located(
                     (By.XPATH, '//div[starts-with(@id, "CATEGORY_ASSOCIATIONS_GRID_")]')))[1]
 
             actual_tags = {s.strip() for s in e.text.split('\n')}
@@ -253,10 +254,10 @@ class Job:
         for i in indices_of_qa_to_edit:
             # Scroll to quick action, right click it, and select first option with KeyDown and Enter
             e = self.find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(i)+')')
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", e)
-            ActionChains(self.driver).context_click(e).perform()
+            driver.execute_script("arguments[0].scrollIntoView(true);", e)
+            ActionChains(driver).context_click(e).perform()
             time.sleep(0.5)
-            ActionChains(self.driver).send_keys(Keys.DOWN, Keys.ENTER).perform()
+            ActionChains(driver).send_keys(Keys.DOWN, Keys.ENTER).perform()
             # End of block
             
 
@@ -267,7 +268,7 @@ class Job:
             # self.e = self.find_e( Quick Action Context Menu )
             self.actionChains.click(self.e).perform()
             # Quick Action popup window scrolling
-            self.driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 500)
+            driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 500)
             # Remove Categories
             categories = self.find_e(
                              'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item.x-grid-view-default.x-unselectable'
@@ -310,26 +311,24 @@ class Job:
             return None  # Marsha not found
         else:
             # Click next page button and check results again
-            self.driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
+            driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
             page += 1
             self.find_marsha(marsha, page)  # Beware unregistered click
             # Add condition check for last page of results, return None if True
 
     def get_num_results(self):
-        results = self.driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
+        results = driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
         print(results)
         # 'Displaying 1 - 200 of 807'
         self.results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())  # 1
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
 
-    # Alias method for shortened method name
+    # Alias methods for shortened name
+    # CSS_SELECTOR, XPATH, CLASS_NAME, ID,
+    # LINK_TEXT, NAME, PARTIAL_LINK_TEXT, TAG_NAME
     def find_e(self, element, by=By.CSS_SELECTOR):
-        # CSS_SELECTOR, XPATH, CLASS_NAME, ID,
-        # LINK_TEXT, NAME, PARTIAL_LINK_TEXT, TAG_NAME
-        if by == By.CSS_SELECTOR:
-            return self.driver.find_element(By.CSS_SELECTOR, element)
-        if by == By.XPATH:
-            return self.driver.find_element(By.XPATH, element)
-        if by == By.CLASS_NAME:
-            return self.driver.find_element(By.CLASS_NAME, element)
+        return driver.find_element(by, element)
+
+    def find_e_wait(self, element, by=By.CSS_SELECTOR):
+        return wait.until(EC.presence_of_element_located((by, element) ))
