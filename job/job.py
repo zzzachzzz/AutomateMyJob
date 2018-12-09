@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -42,18 +43,11 @@ C = Components  # Alias, shortened "import" name
 
 
 class Job:
-    def __init__(self):
-        # self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
+    def __init__(self, marsha='SFONW'):
+        self.marsha = marsha.upper()
+        self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
         colorama.init(autoreset=True)
         print("Job instance created")
-    
-    def launch(self):
-        url = 'http://wemprod.marriott.com:27110/content/#/workspace/folder/hotelwebsites/us/' + \
-               self.marsha.lower()[0]+'/'+self.marsha.lower()+'/IPP'+self.instance
-        driver = webdriver.Chrome()
-        # driver.implicitly_wait(10)
-        wait = webdriver.support.ui.WebDriverWait(driver, 10)
-        driver.get(url)
 
     def login(self):
         with open('creds.json', 'r') as file:
@@ -94,6 +88,7 @@ class Job:
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+
             tbody = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
             e.click()
@@ -248,8 +243,9 @@ class Job:
         e = self.find_e('#vui-workspace-ribbon-quickaction')
         if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
             e.click()
-        all_quick_actions = self.find_e('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
-        indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
+        all_quick_actions = self.find_e_wait('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
+        indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
+                                 if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
 
         for i in indices_of_qa_to_edit:
             # Scroll to quick action, right click it, and select first option with KeyDown and Enter
@@ -259,21 +255,15 @@ class Job:
             time.sleep(0.5)
             ActionChains(driver).send_keys(Keys.DOWN, Keys.ENTER).perform()
             # End of block
+            self.find_e_wait('#vui-wizard-quickaction-advancedsettings-legendTitle').click()
             
-
-
-
-
-            # TODO
-            # self.e = self.find_e( Quick Action Context Menu )
-            self.actionChains.click(self.e).perform()
-            # Quick Action popup window scrolling
-            driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 500)
+            # Quick Action popup window scroll to bottom
+            driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 1000)
             # Remove Categories
             categories = self.find_e(
-                             'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item.x-grid-view-default.x-unselectable'
-                             ).find_element_by_css_selector('table > tbody'
-                             ).find_elements_by_tag_name('tr')  # Last call returns list of elements
+                    'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item' + \
+                    '.x-grid-view-default.x-unselectable > table > tbody'
+                    ).find_elements_by_tag_name('tr')  # List of elements
             for i in range(2, len(categories)):  # First element is a header
                 cell = categories[i].find_element_by_css_selector('td.x-grid-cell-last')
                 if (re.search(r'^[\s]*[A-Z]{5}[\s]*$', cell.text, re.I) or  # If a marsha tag
@@ -284,20 +274,74 @@ class Job:
             self.find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
             # Click Add Categories
             self.find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
-            self.find_marsha()
+            self.find_marsha(self.marsha)
+            print("Sleeping... for 3 minutes")
+            time.sleep(180)
         # endfor
 
+    def add_marsha(self):
+        # self.marsha = 'SACAK'
+        # self.marsha_location['page'] = 1
+        # self.marsha_location['nth-child'] = 2
 
-    def find_marsha(self, marsha, page=1):
-        if self.marsha_location['nth-child'] == True:  # Marsha already located and 'M' folder should be showing, go directly to nth-child and page
-            pass #
+        xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
+                ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
+                '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
+        # Wait for folders to load
+        WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
+        if self.marsha_location['page'] != 1:  # Navigate to page containing marsha
+            xpath_page_input = '//input[@name="inputItem"][@class="x-form-field x-form-text"]'
+            self.find_e(xpath_page_input, by=By.XPATH).send_keys(Keys.ENTER)
+            self.find_e(xpath_page_input, by=By.XPATH).send_keys(
+                    Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
+            loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+                    '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+                    )[1].get_attribute('id')
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
+                    EC.visibility_of_element_located((By.ID, loading_id) ))
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
+                    EC.invisibility_of_element_located((By.ID, loading_id) ))
+        tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
+        e = tbody.find_element_by_css_selector('tr:nth-child(' + \
+                str(self.marsha_location['nth-child']) + \
+                ') > td:nth-child(2) > div > div')
+        if e.text == self.marsha:
+            tbody.find_element_by_css_selector('tr:nth-child(' + \
+                    str(self.marsha_location['nth-child']) + \
+                    ') > td:nth-child(1) > div > div').click()
+            # Click Add to Selections
+            self.find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
+                    '[text()="Add to Selections"]', by=By.XPATH).click()
+            # Click OK
+            self.find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
+                    by=By.XPATH).click()
+            return True
+        else:  # If the location moved, it will need to be found again
+            self.marsha_location['nth-child'] = 0
+            self.marsha_location['page'] = 0
+            return None
+
+    def find_marsha(self, page=1):
+        xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
+                ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
+                '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
+        # Marsha already located and 'M' folder should be showing, go directly to nth-child and page
+        if self.marsha_location['nth-child'] != 0:
+            if self.marsha_location['page'] != 1:
+                e = driver.find_element_by_xpath('//input[@name="inputItem"][@class="x-form-field x-form-text"]')
+                e.send_keys(Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
+            WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
+
         # Check if 'M' folder is selected
         # If not, navigate to folder
-        tbody = self.find_e(
-                         'div.x-panel.vui-grid.vui-grid-content.vui-picker-grid.x-grid-with-row-lines.x-fit-item.x-panel-default-framed.x-grid'
-                     ).find_element_by_tag_name('tbody')
+
+        
+
+        WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
         self.get_num_results()
         end = 200 if self.results_end % 200 == 0 else self.results_end % 200
+
+        tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
         e = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
         if marsha <= e.text:
             for n in range(2, end+2):
@@ -312,8 +356,19 @@ class Job:
         else:
             # Click next page button and check results again
             driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
+
+
+            loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+                    '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+                    )[1].get_attribute('id')
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
+                    EC.visibility_of_element_located((By.ID, loading_id) ))
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
+                    EC.invisibility_of_element_located((By.ID, loading_id) ))
+
             page += 1
             self.find_marsha(marsha, page)  # Beware unregistered click
+
             # Add condition check for last page of results, return None if True
 
     def get_num_results(self):
