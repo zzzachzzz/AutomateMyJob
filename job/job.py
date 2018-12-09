@@ -274,7 +274,15 @@ class Job:
             self.find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
             # Click Add Categories
             self.find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
-            self.find_marsha(self.marsha)
+            # self.find_marsha(self.marsha)
+
+            if self.marsha_location['nth-child'] != 0:  # Marsha folder located
+                self.add_marsha()
+            # Check location again. If add_marsha() failed, value is set back to zero.
+            if self.marsha_location['nth-child'] == 0:
+                self.find_marsha()
+                self.add_marsha()
+
             print("Sleeping... for 3 minutes")
             time.sleep(180)
         # endfor
@@ -319,45 +327,36 @@ class Job:
         else:  # If the location moved, it will need to be found again
             self.marsha_location['nth-child'] = 0
             self.marsha_location['page'] = 0
-            return None
+            return False
 
     def find_marsha(self, page=1):
         xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
                 ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
                 '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
         # Marsha already located and 'M' folder should be showing, go directly to nth-child and page
-        if self.marsha_location['nth-child'] != 0:
-            if self.marsha_location['page'] != 1:
-                e = driver.find_element_by_xpath('//input[@name="inputItem"][@class="x-form-field x-form-text"]')
-                e.send_keys(Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
-            WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
-
         # Check if 'M' folder is selected
         # If not, navigate to folder
-
-        
-
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
         self.get_num_results()
         end = 200 if self.results_end % 200 == 0 else self.results_end % 200
-
         tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
-        e = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
-        if marsha <= e.text:
+        # Get text of last result shown and compare alphabetically
+        last_result_shown = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
+        if self.marsha <= last_result_shown.text:
             for n in range(2, end+2):
                 e = tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(2) > div > div')
                 # return When found | self.tbody.find_element_by_css_selector('tr:nth-child(' + str(marsha+1) + ') > td:nth-child(1) > div > div').click()
-                if e.text == marsha:
+                if e.text == self.marsha:
                     tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(1) > div > div').click()
                     self.marsha_location['nth-child'] = n
                     self.marsha_location['page'] = page
-                    return e.text
-            return None  # Marsha not found
+                    return True
+            return False  # Rare failure, missing folder
         else:
+            if self.results_total == self.results_end:  # If on last page of results
+                return False  # Rare failure, missing folder
             # Click next page button and check results again
             driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
-
-
             loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
                     '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
                     )[1].get_attribute('id')
@@ -365,11 +364,8 @@ class Job:
                     EC.visibility_of_element_located((By.ID, loading_id) ))
             WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
                     EC.invisibility_of_element_located((By.ID, loading_id) ))
-
             page += 1
-            self.find_marsha(marsha, page)  # Beware unregistered click
-
-            # Add condition check for last page of results, return None if True
+            self.find_marsha(page)
 
     def get_num_results(self):
         results = driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
