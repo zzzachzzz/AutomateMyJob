@@ -289,6 +289,7 @@ class Job:
         # endfor
 
     def add_marsha(self):
+        print("add_marsha()")
         # self.marsha = 'SACAK'
         # self.marsha_location['page'] = 1
         # self.marsha_location['nth-child'] = 2
@@ -299,33 +300,34 @@ class Job:
         # Wait for folders to load
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
         self.get_displaying_results_info()
-        if self.marsha_location['page'] != self.current_page:  # Navigate to page containing marsha
-        # if self.marsha_location['page'] != 1:  # Navigate to page containing marsha
-            xpath_page_input = '//input[@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
-            self.find_e(xpath_page_input, by=By.XPATH).send_keys(Keys.ENTER)
-            self.find_e(xpath_page_input, by=By.XPATH).send_keys(
-                    Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
-            loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
-                    '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
-                    )[1].get_attribute('id')
-            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
-                    EC.visibility_of_element_located((By.ID, loading_id) ))
-            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
-                    EC.invisibility_of_element_located((By.ID, loading_id) ))
+        # if self.marsha_location['page'] != self.current_page:  # Navigate to page containing marsha
+        xpath_page_input = '//input[starts-with(@id, "numberfield-")][@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
+        page_input = driver.find_elements_by_xpath(xpath_page_input)[1]
+        page_input.send_keys(Keys.ENTER)
+        page_input.send_keys(
+            Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
+        loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+            '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+            )[1].get_attribute('id')
+        WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
+            EC.visibility_of_element_located((By.ID, loading_id) ))
+        WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
+            EC.invisibility_of_element_located((By.ID, loading_id) ))
+        # end of old if block
         tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
         e = tbody.find_element_by_css_selector('tr:nth-child(' + \
                 str(self.marsha_location['nth-child']) + \
                 ') > td:nth-child(2) > div > div')
         if e.text == self.marsha:
             tbody.find_element_by_css_selector('tr:nth-child(' + \
-                    str(self.marsha_location['nth-child']) + \
-                    ') > td:nth-child(1) > div > div').click()
+                str(self.marsha_location['nth-child']) + \
+                ') > td:nth-child(1) > div > div').click()
             # Click Add to Selections
             self.find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
                     '[text()="Add to Selections"]', by=By.XPATH).click()
             # Click OK
             self.find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
-                    by=By.XPATH).click()
+                by=By.XPATH).click()
             return True
         else:  # If the location moved, it will need to be found again
             self.marsha_location['nth-child'] = 0
