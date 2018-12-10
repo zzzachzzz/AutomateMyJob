@@ -284,6 +284,7 @@ class Job:
                 self.add_marsha()
 
             print("Sleeping... for 3 minutes")
+            return
             time.sleep(180)
         # endfor
 
@@ -297,8 +298,10 @@ class Job:
                 '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
         # Wait for folders to load
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
-        if self.marsha_location['page'] != 1:  # Navigate to page containing marsha
-            xpath_page_input = '//input[@name="inputItem"][@class="x-form-field x-form-text"]'
+        self.get_displaying_results_info()
+        if self.marsha_location['page'] != self.current_page:  # Navigate to page containing marsha
+        # if self.marsha_location['page'] != 1:  # Navigate to page containing marsha
+            xpath_page_input = '//input[@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
             self.find_e(xpath_page_input, by=By.XPATH).send_keys(Keys.ENTER)
             self.find_e(xpath_page_input, by=By.XPATH).send_keys(
                     Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
@@ -327,6 +330,8 @@ class Job:
         else:  # If the location moved, it will need to be found again
             self.marsha_location['nth-child'] = 0
             self.marsha_location['page'] = 0
+            # TODO
+            # Close categories to prepare for find_marsha, or return to page 1
             return False
 
     def find_marsha(self, page=1):
@@ -337,7 +342,7 @@ class Job:
         # Check if 'M' folder is selected
         # If not, navigate to folder
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
-        self.get_num_results()
+        self.get_displaying_results_info()
         end = 200 if self.results_end % 200 == 0 else self.results_end % 200
         tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
         # Get text of last result shown and compare alphabetically
@@ -345,7 +350,6 @@ class Job:
         if self.marsha <= last_result_shown.text:
             for n in range(2, end+2):
                 e = tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(2) > div > div')
-                # return When found | self.tbody.find_element_by_css_selector('tr:nth-child(' + str(marsha+1) + ') > td:nth-child(1) > div > div').click()
                 if e.text == self.marsha:
                     tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(1) > div > div').click()
                     self.marsha_location['nth-child'] = n
@@ -367,13 +371,15 @@ class Job:
             page += 1
             self.find_marsha(page)
 
-    def get_num_results(self):
+    def get_displaying_results_info(self):
         results = driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
         print(results)
         # 'Displaying 1 - 200 of 807'
         self.results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())  # 1
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
+        self.current_page = self.results_begin // (
+                self.results_end - self.results_begin + 1) + 1
 
     # Alias methods for shortened name
     # CSS_SELECTOR, XPATH, CLASS_NAME, ID,

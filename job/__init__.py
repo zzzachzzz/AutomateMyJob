@@ -13,7 +13,8 @@ from pprint import pprint
 from importlib import reload
 
 
-driver = webdriver.Chrome()
+# driver = webdriver.Chrome()
+driver = webdriver.Ie()
 wait = webdriver.support.ui.WebDriverWait(driver, 10)
 from . import job
 from . import build
