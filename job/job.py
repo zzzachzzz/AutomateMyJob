@@ -11,8 +11,9 @@ import logging
 import json
 import time
 import re
-
 from . import driver, wait
+from . import find_e, find_e_wait, find_all_e, find_all_e_wait
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -52,15 +53,15 @@ class Job:
     def login(self):
         with open('creds.json', 'r') as file:
             creds = json.load(file)
-        e = self.find_e('#vui-login-name-inputEl')
+        e = find_e('#vui-login-name-inputEl')
         e.send_keys(creds['user'])
-        e = self.find_e('#vui-login-pass-inputEl')
+        e = find_e('#vui-login-pass-inputEl')
         e.send_keys(creds['pass'])
-        e = self.find_e('#vui-login-link-submit-btnEl')
+        e = find_e('#vui-login-link-submit-btnEl')
         e.click()
 
     def get_vcmid(self):
-        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
@@ -73,27 +74,27 @@ class Job:
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(4)')  # View Item button
             e.click()
             # time.sleep(2)
-            # wait.until(EC.frame_to_be_available_and_switch_to_it(self.find_e('iframe')))
+            # wait.until(EC.frame_to_be_available_and_switch_to_it(find_e('iframe')))
             driver.switch_to.frame(
                     wait.until(EC.presence_of_element_located((By.TAG_NAME,'iframe') )))
-            e = self.find_e_wait('html > body > textarea')
+            e = find_e_wait('html > body > textarea')
             text = e.text
             driver.switch_to.default_content()
-            self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
+            find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
             print(Back.CYAN + re.search(r'(?<=<VignVCMId>).*(?=</VignVCMId)', text).group())
 
     # For fixing "stale" content
     def stale(self):
-        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
-            # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+            # tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
 
             tbody = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
             e.click()
-            e = self.find_e_wait('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
-            e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+            e = find_e_wait('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+            e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys('x')
             e = driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
@@ -102,7 +103,7 @@ class Job:
             wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
             time.sleep(2)
             wait.until(EC.element_to_be_clickable((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
-            e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+            e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
             e = e.find_element_by_tag_name('input')
             e.send_keys(Keys.BACKSPACE)
             e = wait.until(EC.visibility_of_element_located((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
@@ -111,10 +112,10 @@ class Job:
     # Future
     def translate(self):
         pass
-        # tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        # tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
         # tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         # for i in range(2, tr_child_len+1):
-        #     tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        #     tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
 
         #     name = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div').text
         #     type_ = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(7) > div').text
@@ -124,12 +125,12 @@ class Job:
         #     e.click()  # Click Checkbox
 
         # driver.find_element_by_id('vui-wizard-startworkflow-name-input').send_keys('wow')
-        # e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+        # e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
         # e = e.find_element_by_tag_name('input')
         # e.send_keys('x')
         # e = driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
         # e.click()
-        # e = self.find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
+        # e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
         # e = e.find_element_by_tag_name('input')
         # e.send_keys(Keys.BACKSPACE)
         # e = driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
@@ -175,7 +176,7 @@ class Job:
 
 
     def check_formatting(self):
-        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div')
@@ -186,9 +187,9 @@ class Job:
                 e.click()
                 driver.switch_to.frame(
                         wait.until(EC.presence_of_element_located((By.TAG_NAME,'iframe') )))
-                text = self.find_e_wait('html > body > textarea').text
+                text = find_e_wait('html > body > textarea').text
                 driver.switch_to.default_content()
-                self.find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
+                find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
                 if re.search(r'font', text):
                     print(Back.RED+Style.BRIGHT+"Formatting found on {}".format(name))
                 else:
@@ -200,8 +201,8 @@ class Job:
     def check_tags(self, marsha, instance):
         self.marsha = marsha
         self.instance = instance
-        # e = self.find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
-        tbody = self.find_e('#vui-workspace-grid-body > div > table > tbody')
+        # e = find_e('#vui-workspace-grid-body > div > table > tbody > tr:nth-child('+str(i)+')')
+        tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
         tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
         for i in range(2, tr_child_len+1):
             # Click on row before clicking on properties button to avoid unregistered clicks when out of view
@@ -215,7 +216,7 @@ class Job:
             expected_tags = self.get_expected_tags(name)  # Returns set
             # print(expected_tags)
             # Menu bar "Overview, Translations, Publishing, Channels, Categories, etc"
-            categories_tab = self.find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct'
+            categories_tab = find_e('div.x-tab-bar-body.x-tab-bar-body-top.x-tab-bar-body-default-top.x-tab-bar-body-horizontal.x-tab-bar-body-default-horizontal.x-tab-bar-body-default.x-tab-bar-body-default-top.x-tab-bar-body-default-horizontal.x-tab-bar-body-default-docked-top.x-box-layout-ct'
                                          + ' > div:nth-child(2) > div > div:nth-child(5) > em > button')
             categories_tab.click()
             e = wait.until(EC.presence_of_all_elements_located(
@@ -233,34 +234,34 @@ class Job:
             for tag in actual_tags.difference(expected_tags):
                 print(Back.RED+Style.BRIGHT+"Tag should not be present: {}".format(tag))
 
-            self.find_e('img.x-tool-close').click()  # Close popup
+            find_e('img.x-tool-close').click()  # Close popup
             print("-------------------------------")
         return
 
 
     def edit_quick_actions(self):
         # Check if Quick Action bar is expanded (selected)
-        e = self.find_e('#vui-workspace-ribbon-quickaction')
+        e = find_e('#vui-workspace-ribbon-quickaction')
         if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
             e.click()
-        all_quick_actions = self.find_e_wait('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
+        all_quick_actions = find_e_wait('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
         indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
                                  if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
 
         for i in indices_of_qa_to_edit:
             # Scroll to quick action, right click it, and select first option with KeyDown and Enter
-            e = self.find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(i)+')')
+            e = find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(i)+')')
             driver.execute_script("arguments[0].scrollIntoView(true);", e)
             ActionChains(driver).context_click(e).perform()
             time.sleep(0.5)
             ActionChains(driver).send_keys(Keys.DOWN, Keys.ENTER).perform()
             # End of block
-            self.find_e_wait('#vui-wizard-quickaction-advancedsettings-legendTitle').click()
+            find_e_wait('#vui-wizard-quickaction-advancedsettings-legendTitle').click()
             
             # Quick Action popup window scroll to bottom
-            driver.execute_script("arguments[0].scrollTop = arguments[1];", self.find_e("#vui-vcm-quickaction-body"), 1000)
+            driver.execute_script("arguments[0].scrollTop = arguments[1];", find_e("#vui-vcm-quickaction-body"), 1000)
             # Remove Categories
-            categories = self.find_e(
+            categories = find_e(
                     'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item' + \
                     '.x-grid-view-default.x-unselectable > table > tbody'
                     ).find_elements_by_tag_name('tr')  # List of elements
@@ -271,9 +272,9 @@ class Job:
                     # Click checkbox for cell removal
                     categories[i].find_element_by_css_selector('td.x-grid-cell-first > div > div').click()
             # Click Remove Categories
-            self.find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
+            find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
             # Click Add Categories
-            self.find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
+            find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
             # self.find_marsha(self.marsha)
 
             if self.marsha_location['nth-child'] != 0:  # Marsha folder located
@@ -314,7 +315,7 @@ class Job:
         WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
             EC.invisibility_of_element_located((By.ID, loading_id) ))
         # end of old if block
-        tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
+        tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
         e = tbody.find_element_by_css_selector('tr:nth-child(' + \
                 str(self.marsha_location['nth-child']) + \
                 ') > td:nth-child(2) > div > div')
@@ -323,10 +324,10 @@ class Job:
                 str(self.marsha_location['nth-child']) + \
                 ') > td:nth-child(1) > div > div').click()
             # Click Add to Selections
-            self.find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
+            find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
                     '[text()="Add to Selections"]', by=By.XPATH).click()
             # Click OK
-            self.find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
+            find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
                 by=By.XPATH).click()
             return True
         else:  # If the location moved, it will need to be found again
@@ -346,7 +347,7 @@ class Job:
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
         self.get_displaying_results_info()
         end = 200 if self.results_end % 200 == 0 else self.results_end % 200
-        tbody = self.find_e_wait(xpath_to_tbody, by=By.XPATH)
+        tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
         # Get text of last result shown and compare alphabetically
         last_result_shown = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
         if self.marsha <= last_result_shown.text:
@@ -364,12 +365,12 @@ class Job:
             # Click next page button and check results again
             driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
             loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
-                    '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
-                    )[1].get_attribute('id')
+                '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+                )[1].get_attribute('id')
             WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
-                    EC.visibility_of_element_located((By.ID, loading_id) ))
+                EC.visibility_of_element_located((By.ID, loading_id) ))
             WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
-                    EC.invisibility_of_element_located((By.ID, loading_id) ))
+                EC.invisibility_of_element_located((By.ID, loading_id) ))
             page += 1
             self.find_marsha(page)
 
@@ -381,13 +382,14 @@ class Job:
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
         self.current_page = self.results_begin // (
-                self.results_end - self.results_begin + 1) + 1
+            self.results_end - self.results_begin + 1) + 1
 
-    # Alias methods for shortened name
-    # CSS_SELECTOR, XPATH, CLASS_NAME, ID,
-    # LINK_TEXT, NAME, PARTIAL_LINK_TEXT, TAG_NAME
-    def find_e(self, element, by=By.CSS_SELECTOR):
-        return driver.find_element(by, element)
+    def navigate_folders(self):
+        tbody = driver.find_elements_by_xpath(  # Sidebar "Category Tree"
+            '//div[@class="x-panel-body x-grid-body x-panel-body-default x-panel-body-default x-layout-fit"]' + \
+            '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody')
 
-    def find_e_wait(self, element, by=By.CSS_SELECTOR):
-        return wait.until(EC.presence_of_element_located((by, element) ))
+        # Upon clicking category, element is detached from DOM. Selector below necessary before another click
+        all_categories_expand = e.find_element_by_css_selector('tr:nth-child(2) > td > div > img:nth-child(1)')
+        all_categories_expand.click()
+        # Best to enter "Select Categories" at root directory "All Categories" ... collapse upon closing

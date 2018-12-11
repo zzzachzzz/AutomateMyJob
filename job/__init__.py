@@ -13,9 +13,11 @@ from pprint import pprint
 from importlib import reload
 
 
+
 driver = webdriver.Chrome()
 # driver = webdriver.Ie()
 wait = webdriver.support.ui.WebDriverWait(driver, 10)
+from .alias_util_functions import find_e, find_e_wait, find_all_e, find_all_e_wait, k
 from . import job
 from . import build
 j = job.Job()
