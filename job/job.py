@@ -44,7 +44,7 @@ C = Components  # Alias, shortened "import" name
 
 
 class Job:
-    def __init__(self, marsha='SFONW'):
+    def __init__(self, marsha='TCISI'):
         self.marsha = marsha.upper()
         self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
         colorama.init(autoreset=True)
@@ -245,8 +245,10 @@ class Job:
         if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
             e.click()
         all_quick_actions = find_e_wait('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
+        # indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
+        #                          if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
         indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
-                                 if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
+                                 if (re.search(r'^0[0-9]{2}', qa) and re.search(r'\[M\]', qa) )]
 
         for i in indices_of_qa_to_edit:
             # Scroll to quick action, right click it, and select first option with KeyDown and Enter
@@ -262,10 +264,10 @@ class Job:
             driver.execute_script("arguments[0].scrollTop = arguments[1];", find_e("#vui-vcm-quickaction-body"), 1000)
             # Remove Categories
             categories = find_e(
-                    'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item' + \
-                    '.x-grid-view-default.x-unselectable > table > tbody'
-                    ).find_elements_by_tag_name('tr')  # List of elements
-            for i in range(2, len(categories)):  # First element is a header
+                'div.x-grid-view.vui-quickaction-category-grid-scroll.x-fit-item' + \
+                '.x-grid-view-default.x-unselectable > table > tbody'
+                ).find_elements_by_tag_name('tr')  # List of elements
+            for i in range(1, len(categories)):  # First element is a header
                 cell = categories[i].find_element_by_css_selector('td.x-grid-cell-last')
                 if (re.search(r'^[\s]*[A-Z]{5}[\s]*$', cell.text, re.I) or  # If a marsha tag
                     re.search(r'^[\s]*0{1}[0-9]{1}[\s]*$', cell.text, re.I)):  # If an instance tag
