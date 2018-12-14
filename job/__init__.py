@@ -11,7 +11,11 @@ use_ie = input()
 if use_ie in {'ie', 'i'}:
     driver = webdriver.Ie()
 else:
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument('user-data-dir=C:\\Local\\selenium_chrome_profile')
+    options.add_argument('--disable-infobars')
+    path = 'C:\\Local\\chromedriver_win32\\chromedriver.exe'
+    driver = webdriver.Chrome(executable_path=path, chrome_options=options)
 wait = webdriver.support.ui.WebDriverWait(driver, 10)
 
 from .alias_util_functions import find_e, find_e_wait, find_all_e, find_all_e_wait, k
