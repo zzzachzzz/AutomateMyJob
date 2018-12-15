@@ -44,7 +44,7 @@ C = Components  # Alias, shortened "import" name
 
 
 class Job:
-    def __init__(self, marsha='TCISI'):
+    def __init__(self, marsha='TZXRI'):
         self.marsha = marsha.upper()
         self.marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
         colorama.init(autoreset=True)
@@ -280,22 +280,21 @@ class Job:
             # self.find_marsha(self.marsha)
 
             if self.marsha_location['nth-child'] != 0:  # Marsha folder located
-                self.add_marsha()
+                self.add_category()
             # Check location again. If add_marsha() failed, value is set back to zero.
             if self.marsha_location['nth-child'] == 0:
                 self.find_marsha()
-                self.add_marsha()
+                self.add_category()
 
             print("Sleeping... for 3 minutes")
             return
             time.sleep(180)
         # endfor
 
-    def add_marsha(self):
-        print("add_marsha()")
-        # self.marsha = 'SACAK'
+    def add_category(self):
+        # self.marsha = 'TAEMR'
         # self.marsha_location['page'] = 1
-        # self.marsha_location['nth-child'] = 2
+        # self.marsha_location['nth-child'] = 3
 
         xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
                 ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
@@ -303,19 +302,19 @@ class Job:
         # Wait for folders to load
         WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
         self.get_displaying_results_info()
-        # if self.marsha_location['page'] != self.current_page:  # Navigate to page containing marsha
-        xpath_page_input = '//input[starts-with(@id, "numberfield-")][@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
-        page_input = driver.find_elements_by_xpath(xpath_page_input)[1]
-        page_input.send_keys(Keys.ENTER)
-        page_input.send_keys(
-            Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
-        loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
-            '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
-            )[1].get_attribute('id')
-        WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
-            EC.visibility_of_element_located((By.ID, loading_id) ))
-        WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
-            EC.invisibility_of_element_located((By.ID, loading_id) ))
+        if self.marsha_location['page'] != self.get_curr_page_num():  # Navigate to page containing marsha
+            xpath_page_input = '//input[starts-with(@id, "numberfield-")][@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
+            page_input = driver.find_elements_by_xpath(xpath_page_input)[1]
+            page_input.send_keys(Keys.ENTER)
+            page_input.send_keys(
+                Keys.BACKSPACE + str(self.marsha_location['page']) + Keys.ENTER)
+            loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+                '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+                )[1].get_attribute('id')
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to appear
+                EC.visibility_of_element_located((By.ID, loading_id) ))
+            WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
+                EC.invisibility_of_element_located((By.ID, loading_id) ))
         # end of old if block
         tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
         e = tbody.find_element_by_css_selector('tr:nth-child(' + \
@@ -356,7 +355,6 @@ class Job:
             for n in range(2, end+2):
                 e = tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(2) > div > div')
                 if e.text == self.marsha:
-                    tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(1) > div > div').click()
                     self.marsha_location['nth-child'] = n
                     self.marsha_location['page'] = page
                     return True
@@ -377,21 +375,48 @@ class Job:
             self.find_marsha(page)
 
     def get_displaying_results_info(self):
-        results = driver.find_elements_by_xpath('//div[starts-with(text(), "Displaying")]')[1].text
-        print(results)
-        # 'Displaying 1 - 200 of 807'
+        results = driver.find_elements_by_xpath(
+            '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
         self.results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())  # 1
         self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
         self.results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
         self.current_page = self.results_begin // (
             self.results_end - self.results_begin + 1) + 1
 
+    def get_curr_page_num(self):
+        results = driver.find_elements_by_xpath(
+            '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
+        self.results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())
+        self.results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())
+        self.results_total = int(re.search(r'(?<=of ).+', results).group())
+        self.current_page = self.results_begin // (
+            self.results_end - self.results_begin + 1) + 1
+        return self.current_page
+
     def navigate_folders(self):
-        tbody = driver.find_elements_by_xpath(  # Sidebar "Category Tree"
+        tbody = find_e(  # Sidebar "Category Tree"
             '//div[@class="x-panel-body x-grid-body x-panel-body-default x-panel-body-default x-layout-fit"]' + \
-            '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody')
+            '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody', By.XPATH)
 
         # Upon clicking category, element is detached from DOM. Selector below necessary before another click
-        all_categories_expand = e.find_element_by_css_selector('tr:nth-child(2) > td > div > img:nth-child(1)')
-        all_categories_expand.click()
+        all_categories_expand = tbody.find_element_by_css_selector('tr:nth-child(2) > td > div')
+        all_categories_expand.click() # Sometimes click does not register even when scrolled into view :thinking: ...
         # Best to enter "Select Categories" at root directory "All Categories" ... collapse upon closing
+        # When clicking "All Categories" to collapse, must click text, not the "-/+" img
+
+category_path = ['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta']
+
+def ok():
+    curr_depth_len, start = len(tbody.find_elements_by_tag_name('tr')), 3
+    for depth in category_path:
+        for i in range(start, curr_depth_len):
+            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div')
+            if e.text == depth:
+                if category_path.index(depth) == len(category_path)-1:  # If list item is the last of the list (index of -1)
+                    pass
+                elif category_path.index(depth) == len(category_path)-2:  # If list item is second to last (index of -2)
+                    e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div')
+                    e.click()
+                else:
+                    e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div > img.x-tree-elbow-plus.x-tree-expander')
+                    e.click()
