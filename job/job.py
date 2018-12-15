@@ -43,10 +43,10 @@ class Components:
 C = Components  # Alias, shortened "import" name
 
 
-
 marsha = marsha.upper()
 marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
 colorama.init(autoreset=True)
+
 
 def login():
     with open('creds.json', 'r') as file:
@@ -57,6 +57,7 @@ def login():
     e.send_keys(creds['pass'])
     e = find_e('#vui-login-link-submit-btnEl')
     e.click()
+
 
 def get_vcmid():
     tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
@@ -81,13 +82,13 @@ def get_vcmid():
         find_e('#vui-view-contentitem-window_header-targetEl > div:nth-child(4) > img').click()  # Close popup
         print(Back.CYAN + re.search(r'(?<=<VignVCMId>).*(?=</VignVCMId)', text).group())
 
+
 # For fixing "stale" content
 def stale():
     tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
     tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
     for i in range(2, tr_child_len+1):
         # tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
-
         tbody = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
         e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(2) > div > ul > li:nth-child(1)')  # Pencil edit btn
         e.click()
@@ -107,32 +108,6 @@ def stale():
         e = wait.until(EC.visibility_of_element_located((By.XPATH, '//button[@title="Save all pending changes and close this window."]') ))
         e.click()
 
-# Future
-def translate():
-    pass
-    # tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
-    # tr_child_len = len(tbody.find_elements_by_tag_name('tr'))
-    # for i in range(2, tr_child_len+1):
-    #     tbody = find_e('#vui-workspace-grid-body > div > table > tbody')
-
-    #     name = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(3) > div > div').text
-    #     type_ = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(7) > div').text
-    #     if re.search(C.trash, name, re.I) or re.search(r'ADT Wrapper', type_, re.I):  # If trashed item or wrapper type
-    #         continue
-    #     e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td:nth-child(1) > div > div')  # Checkbox
-    #     e.click()  # Click Checkbox
-
-    # driver.find_element_by_id('vui-wizard-startworkflow-name-input').send_keys('wow')
-    # e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
-    # e = e.find_element_by_tag_name('input')
-    # e.send_keys('x')
-    # e = driver.find_element_by_xpath('//button[@title="Save all pending changes."]')
-    # e.click()
-    # e = find_e('table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default')
-    # e = e.find_element_by_tag_name('input')
-    # e.send_keys(Keys.BACKSPACE)
-    # e = driver.find_element_by_xpath('//button[@title="Save all pending changes and close this window."]')
-    # e.click()
 
 def get_expected_tags(name):  # Returns a set
     tile = re.search(r'((?<=Tile)|(?<=Type)|(?<=TITLE))[A-Z]', name, re.I)
@@ -234,7 +209,6 @@ def check_tags(marsha, instance):
 
         find_e('img.x-tool-close').click()  # Close popup
         print("-------------------------------")
-    return
 
 
 def edit_quick_actions():
@@ -289,14 +263,15 @@ def edit_quick_actions():
         time.sleep(180)
     # endfor
 
+
 def add_category():
     # marsha = 'TAEMR'
     # marsha_location['page'] = 1
     # marsha_location['nth-child'] = 3
 
     xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
-            ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
-            '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
+        ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
+        '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
     # Wait for folders to load
     WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
     get_displaying_results_info()
@@ -316,15 +291,15 @@ def add_category():
     # end of old if block
     tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
     e = tbody.find_element_by_css_selector('tr:nth-child(' + \
-            str(marsha_location['nth-child']) + \
-            ') > td:nth-child(2) > div > div')
+        str(marsha_location['nth-child']) + \
+        ') > td:nth-child(2) > div > div')
     if e.text == marsha:
         tbody.find_element_by_css_selector('tr:nth-child(' + \
             str(marsha_location['nth-child']) + \
             ') > td:nth-child(1) > div > div').click()
         # Click Add to Selections
         find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
-                '[text()="Add to Selections"]', by=By.XPATH).click()
+            '[text()="Add to Selections"]', by=By.XPATH).click()
         # Click OK
         find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
             by=By.XPATH).click()
@@ -336,7 +311,9 @@ def add_category():
         # Close categories to prepare for find_marsha, or return to page 1
         return False
 
-# Binary search a list of web element objects for an item as a string, with a selector for the item's text
+
+# Binary search a list of web element objects for an item as a string,
+# with a selector for the item's text.
 def binary_search_web_element_list(arr: list, start: int, end: int, selector_for_item: tuple, item: str) -> int:
     while start <= end:
         mid = start + (end - start) // 2
@@ -352,19 +329,13 @@ def binary_search_web_element_list(arr: list, start: int, end: int, selector_for
             end = mid - 1
     # If we reach here, then the element was not present.
     return -1
+# binary_search_web_element_list(arr, 1, len(arr)-1, x)
 
-binary_search_category(arr, 1, len(arr)-1, x)
-
-def binary_search_category_tree():
-    pass
-
-def pas():
-    pass
 
 def find_marsha(page=1):
     xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
-            ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
-            '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
+        ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
+        '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
     # Marsha already located and 'M' folder should be showing, go directly to nth-child and page
     # Check if 'M' folder is selected
     # If not, navigate to folder
@@ -397,6 +368,7 @@ def find_marsha(page=1):
         page += 1
         find_marsha(page)
 
+
 # Possibly deprecated due to new binary search called
 # with list of table rows (tr) passed into function.
 def get_displaying_results_info():
@@ -408,6 +380,7 @@ def get_displaying_results_info():
     current_page = results_begin // (
         results_end - results_begin + 1) + 1
 
+
 def get_curr_page_num():
     results = driver.find_elements_by_xpath(
         '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
@@ -417,6 +390,7 @@ def get_curr_page_num():
     current_page = results_begin // (
         results_end - results_begin + 1) + 1
     return current_page
+
 
 def navigate_folders():
     tbody = find_e(  # Sidebar "Category Tree"
@@ -430,6 +404,7 @@ def navigate_folders():
     # When clicking "All Categories" to collapse, must click text, not the "-/+" img
 
 category_path = ['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta']
+
 
 def ok():
     curr_depth_len, start = len(tbody.find_elements_by_tag_name('tr')), 3
