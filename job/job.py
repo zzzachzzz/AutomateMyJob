@@ -338,6 +338,31 @@ class Job:
             # Close categories to prepare for find_marsha, or return to page 1
             return False
 
+    # Binary search a single page of category results
+    def binary_search_category_results(self, arr, start, end, category):
+        while start <= end:
+            mid = start + (end - start) // 2
+            mid_element_text = arr[mid].find_element_by_css_selector('td:nth-child(2) > div > div').text
+            # Check if category is present at mid
+            if mid_element_text == category:
+                return mid
+            # If category is greater, ignore left half
+            elif mid_element_text < category:
+                start = mid + 1
+            # If category is smaller, ignore right half
+            else:
+                end = mid - 1
+        # If we reach here, then the element was not present.
+        return -1
+
+    self.binary_search_category(arr, 1, len(arr)-1, x)
+
+    def binary_search_category_tree(self):
+        pass
+
+    def pas(self):
+        pass
+
     def find_marsha(self, page=1):
         xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
                 ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
