@@ -338,11 +338,11 @@ class Job:
             # Close categories to prepare for find_marsha, or return to page 1
             return False
 
-    # Binary search a single page of category results
-    def binary_search_category_results(self, arr, start, end, category):
+    # Binary search a list of web element objects for an item as a string, with a selector for the item's text
+    def binary_search_web_element_list(arr: list, start: int, end: int, selector_for_item: tuple, item: str) -> int:
         while start <= end:
             mid = start + (end - start) // 2
-            mid_element_text = arr[mid].find_element_by_css_selector('td:nth-child(2) > div > div').text
+            mid_element_text = arr[mid].find_element(*selector_for_item).text
             # Check if category is present at mid
             if mid_element_text == category:
                 return mid
