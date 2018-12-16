@@ -14,6 +14,8 @@ else:
     options = webdriver.ChromeOptions()
     options.add_argument('user-data-dir=C:\\Local\\selenium_chrome_profile')
     options.add_argument('--disable-infobars')
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("start-maximized")
     path = 'C:\\Local\\chromedriver_win32\\chromedriver.exe'
     driver = webdriver.Chrome(executable_path=path, chrome_options=options)
 wait = webdriver.support.ui.WebDriverWait(driver, 10)
