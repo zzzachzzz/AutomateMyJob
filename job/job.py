@@ -42,7 +42,7 @@ class Components:
 
 C = Components  # Alias, shortened "import" name
 
-
+marsha=''
 marsha = marsha.upper()
 marsha_location = { 'nth-child': 0, 'page': 0 }  # Location in WEM folders
 colorama.init(autoreset=True)
@@ -249,13 +249,13 @@ def edit_quick_actions():
         find_e('#vui-quickaction-grid-button-category-dissociate-btnEl').click()
         # Click Add Categories
         find_e('#vui-quickaction-grid-button-category-associate-btnEl').click()
-        # find_marsha(marsha)
+        # find_category_in_results(marsha)
 
         if marsha_location['nth-child'] != 0:  # Marsha folder located
             add_category()
         # Check location again. If add_marsha() failed, value is set back to zero.
         if marsha_location['nth-child'] == 0:
-            find_marsha()
+            find_category_in_results()
             add_category()
 
         print("Sleeping... for 3 minutes")
@@ -308,55 +308,47 @@ def add_category():
         marsha_location['nth-child'] = 0
         marsha_location['page'] = 0
         # TODO
-        # Close categories to prepare for find_marsha, or return to page 1
+        # Close categories to prepare for find_category_in_results, or return to page 1
         return False
 
 
-# Binary search a list of web element objects for an item as a string,
-# with a selector for the item's text.
-def binary_search_web_element_list(arr: list, start: int, end: int, selector_for_item: tuple, item: str) -> int:
+# Binary search a list of web element objects for an item
+# as a string, with a selector for the item's text.
+def binary_search_web_element_list(arr: list, start: int, end: int,
+                                   selector_for_item: tuple, item: str) -> int:
+    # If last element string is less than item string, item won't be in list.
+    if arr[end].find_element(*selector_for_item).text < item:
+        return -1  # Element was not present
     while start <= end:
-        mid = start + (end - start) // 2
+        mid = (start + end) // 2
         mid_element_text = arr[mid].find_element(*selector_for_item).text
-        # Check if category is present at mid
-        if mid_element_text == category:
+        if mid_element_text == item:
             return mid
-        # If category is greater, ignore left half
-        elif mid_element_text < category:
+        elif mid_element_text < item:
             start = mid + 1
-        # If category is smaller, ignore right half
         else:
             end = mid - 1
-    # If we reach here, then the element was not present.
-    return -1
-# binary_search_web_element_list(arr, 1, len(arr)-1, x)
+    return -1  # Element was not present
+# binary_search_web_element_list(arr, 1, len(arr)-1, item)
 
 
-def find_marsha(page=1):
+def find_category_in_results(item: str) -> int:
     xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
         ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
-        '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
-    # Marsha already located and 'M' folder should be showing, go directly to nth-child and page
-    # Check if 'M' folder is selected
-    # If not, navigate to folder
-    WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
-    get_displaying_results_info()
-    end = 200 if results_end % 200 == 0 else results_end % 200
-    tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
-    # Get text of last result shown and compare alphabetically
-    last_result_shown = tbody.find_element_by_css_selector('tr:nth-child(' + str(end+1) + ') > td:nth-child(2) > div > div')
-    if marsha <= last_result_shown.text:
-        for n in range(2, end+2):
-            e = tbody.find_element_by_css_selector('tr:nth-child(' + str(n) + ') > td:nth-child(2) > div > div')
-            if e.text == marsha:
-                marsha_location['nth-child'] = n
-                marsha_location['page'] = page
-                return True
-        return False  # Rare failure, missing folder
-    else:
-        if results_total == results_end:  # If on last page of results
-            return False  # Rare failure, missing folder
-        # Click next page button and check results again
+        '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr'
+
+    all_tr = WebDriverWait(driver, 40).until(
+        EC.presence_of_all_elements_located((By.XPATH, xpath_to_all_tr) ))
+
+    index_of_item = binary_search_web_element_list(all_tr, 1, len(all_tr)-1,
+        (By.CSS_SELECTOR, 'td:nth-child(2)'), )
+
+    if index_of_item != -1:  # Item found
+        return index_of_item
+
+    if is_last_page_of_results():  # If on last page of results
+        return -1
+    else:  # Click next page button and check results again
         driver.find_elements_by_xpath('//button[@data-qtip="Next Page"]')[1].click()
         loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
             '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
@@ -365,31 +357,26 @@ def find_marsha(page=1):
             EC.visibility_of_element_located((By.ID, loading_id) ))
         WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
             EC.invisibility_of_element_located((By.ID, loading_id) ))
-        page += 1
-        find_marsha(page)
+        # Run again on next page of results
+        find_category_in_results(item)
 
 
-# Possibly deprecated due to new binary search called
-# with list of table rows (tr) passed into function.
-def get_displaying_results_info():
-    results = driver.find_elements_by_xpath(
-        '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
-    results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())  # 1
-    results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())  # 200
-    results_total = int(re.search(r'(?<=of ).+', results).group())  # 807
-    current_page = results_begin // (
-        results_end - results_begin + 1) + 1
-
-
-def get_curr_page_num():
+def get_curr_page_num() -> int:
     results = driver.find_elements_by_xpath(
         '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
     results_begin = int(re.search(r'(?<=ing ).*(?= -)', results).group())
     results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())
-    results_total = int(re.search(r'(?<=of ).+', results).group())
     current_page = results_begin // (
         results_end - results_begin + 1) + 1
     return current_page
+
+
+def is_last_page_of_results() -> bool:
+    results = driver.find_elements_by_xpath(
+        '//div[starts-with(text(), "Displaying")][starts-with(@id, "tbtext-")]')[1].text
+    results_end = int(re.search(r'(?<=- ).*(?= of)', results).group())
+    results_total = int(re.search(r'(?<=of ).+', results).group())
+    return results_total == results_end
 
 
 def navigate_folders():
