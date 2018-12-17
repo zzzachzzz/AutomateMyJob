@@ -4,6 +4,7 @@ from typing import Tuple
 """
 If passing page_type_locator containing only one string in the tuple,
 pass parameter as such: tp = TaggingPaths(('string', ), 'marsha')
+OH YOU COULD ALSO USE tuple() DUH THE PARENTHESIS ARE BEING EVALUATED DIFFERENTLY
 """
 class TaggingPaths:
     def __init__(self, page_type_locator: Tuple[str], marsha: str,

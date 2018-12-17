@@ -21,6 +21,7 @@ else:
 wait = webdriver.support.ui.WebDriverWait(driver, 10)
 
 from .alias_util_functions import find_e, find_e_wait, find_all_e, find_all_e_wait, k
+from . import tagging_paths
 from . import job as j
 from . import build as b
 
