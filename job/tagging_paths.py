@@ -22,18 +22,34 @@ class TaggingPaths:
                                 'singleHeroImage']
         self.heroTextOverlay = ['HWS Tier 3', *page_type_locator,
                                 'heroTextOverlay']
-        self.titleSubtitleText = ['HWS Tier 3', *page_type_locator,
-                                  'titleSubtitleText']
         self.heroTitleLongDescriptionCta = ['HWS Tier 3', *page_type_locator,
                                             'heroTitleLongDescriptionCta']
-
-        self.roomLongDescription = ['HWS Tier 3', *page_type_locator,
-                                    'roomLongDescription']
+        self.titleSubtitleText = ['HWS Tier 3', *page_type_locator,
+                                  'titleSubtitleText']
         self.headingTextListOfArticles = ['HWS Tier 3', *page_type_locator,
                                           'headingTextListOfArticles']
         self.headerTextCta = ['HWS Tier 3', *page_type_locator,
                               'headerTextCta']
         self.titleImage = ['HWS Tier 3', *page_type_locator, 'titleImage']
+
+        # page_type_locator is probably only ever ('Dining Details', )
+        self.restaurantOverview = ['HWS Tier 3', *page_type_locator,
+                                   'restaurantOverview']
+        # page_type_locator is probably only
+        # ever ('Rooms & Suites', 'Room Details')
+        self.roomLongDescription = ['HWS Tier 3', *page_type_locator,
+                                    'roomLongDescription']
+        # page_type_locator is probably only
+        # ever ('Spa and Fitness', 'Fitness Details')
+        self.fitnessOverview = ['HWS Tier 3', *page_type_locator,
+                                'fitnessOverview']
+        # page_type_locator is probably only
+        # ever ('Spa and Fitness', 'Spa Details')
+        self.spaOverview = ['HWS Tier 3', *page_type_locator,
+                            'spaOverview']
+        # page_type_locator is probably only ever (Golf Details', )
+        self.golfOverview = ['HWS Tier 3', *page_type_locator,
+                             'golfOverview']
 
     @property
     def marsha(self):
