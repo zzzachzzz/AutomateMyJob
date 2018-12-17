@@ -11,8 +11,10 @@ import logging
 import json
 import time
 import re
+from typing import List
 from . import driver, wait
 from . import find_e, find_e_wait, find_all_e, find_all_e_wait
+from . import tagging_paths
 
 
 logger = logging.getLogger(__name__)
@@ -210,18 +212,34 @@ def check_tags(marsha, instance):
         find_e('img.x-tool-close').click()  # Close popup
         print("-------------------------------")
 
+def edit_qa_helper():
+    tp = tagging_paths.TaggingPaths(page_type_locator=('', ),
+                                    marsha='NYCHW')
+    categories_to_add = [ tp.marsha ]
+    print(categories_to_add)
 
-def edit_quick_actions():
+    edit_quick_actions(categories_to_add)
+
+
+
+# Accepts a list of categories to add, each including a list
+# representing its full tagging path, each depth being a string.
+# A single category example:
+# [['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta'], ]
+def edit_quick_actions(categories_to_add: List[List[str]]) -> None:
     # Check if Quick Action bar is expanded (selected)
     e = find_e('#vui-workspace-ribbon-quickaction')
     if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
         e.click()
     all_quick_actions = find_e_wait('#vui-workspace-drawer-new-quickaction > ul').text.split('\n')
-    # indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
-    #                          if (re.search(r'^IPP', qa) and not re.search(r'[CDE] Article', qa) )]
+
     indices_of_qa_to_edit = [all_quick_actions.index(qa)+1 for qa in all_quick_actions \
                              if (re.search(r'^0[0-9]{2}', qa) and re.search(r'\[M\]', qa) )]
 
+    for category in categories_to_add:
+        pass
+    # ...
+    # navigate_to_category() tagging path
     for i in indices_of_qa_to_edit:
         # Scroll to quick action, right click it, and select first option with KeyDown and Enter
         e = find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(i)+')')
@@ -274,7 +292,6 @@ def add_category():
         '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody'
     # Wait for folders to load
     WebDriverWait(driver, 40).until(EC.presence_of_element_located((By.XPATH, xpath_to_tbody+'//tr[position()=2]') ))
-    get_displaying_results_info()
     if marsha_location['page'] != get_curr_page_num():  # Navigate to page containing marsha
         xpath_page_input = '//input[starts-with(@id, "numberfield-")][@name="inputItem"][contains(@class, "x-form-field x-form-text")]'
         page_input = driver.find_elements_by_xpath(xpath_page_input)[1]
@@ -288,7 +305,7 @@ def add_category():
             EC.visibility_of_element_located((By.ID, loading_id) ))
         WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
             EC.invisibility_of_element_located((By.ID, loading_id) ))
-    # end of old if block
+    # end of if block
     tbody = find_e_wait(xpath_to_tbody, by=By.XPATH)
     e = tbody.find_element_by_css_selector('tr:nth-child(' + \
         str(marsha_location['nth-child']) + \
@@ -332,6 +349,7 @@ def binary_search_web_element_list(arr: list, start: int, end: int,
 # binary_search_web_element_list(arr, 1, len(arr)-1, item)
 
 
+# Returns index of item in list of tr elements
 def find_category_in_results(item: str) -> int:
     xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
         ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
@@ -378,19 +396,48 @@ def is_last_page_of_results() -> bool:
     results_total = int(re.search(r'(?<=of ).+', results).group())
     return results_total == results_end
 
-
-def navigate_folders():
-    tbody = find_e(  # Sidebar "Category Tree"
+# Example
+category_path = ['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta']
+def find_directory_in_sidebar(directory_path: List[str]) -> None:
+    all_tr_xpath = (  # Sidebar "Category Tree"
         '//div[@class="x-panel-body x-grid-body x-panel-body-default x-panel-body-default x-layout-fit"]' + \
-        '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody', By.XPATH)
+        '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr')
+    all_tr = find_all_e(all_tr_xpath, By.XPATH)
+    start, end = 2, len(all_tr)-1
+    for directory in directory_path:
+        index_of_directory = binary_search_web_element_list(
+            all_tr, start, end, (By.CSS_SELECTOR, 'td > div'), directory)
+        # If list item is second to last in the list
+        if directory_path.index(directory) == len(directory_path)-2:
+            e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR, 'td > div')
+            e.click()
+            return
+
+        e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR,
+            'td > div > img.x-tree-elbow-plus.x-tree-expander')
+        e.click()
+
+        prev_all_tr_length = len(all_tr)-1
+        print(len(all_tr))
+        # Needs custom wait function that waits for the amount of elements to increase
+        all_tr = find_all_e_wait(all_tr_xpath, By.XPATH)
+        print(len(all_tr))
+        start = index_of_directory + 1
+        end = len(all_tr)-1 - prev_all_tr_length + index_of_directory
+        print("Sleepy time :)")
+        time.sleep(2)
+
+
+
+
 
     # Upon clicking category, element is detached from DOM. Selector below necessary before another click
-    all_categories_expand = tbody.find_element_by_css_selector('tr:nth-child(2) > td > div')
+    all_categories_expand = all_tr.find_element_by_css_selector('tr:nth-child(2) > td > div')
     all_categories_expand.click() # Sometimes click does not register even when scrolled into view :thinking: ...
     # Best to enter "Select Categories" at root directory "All Categories" ... collapse upon closing
     # When clicking "All Categories" to collapse, must click text, not the "-/+" img
 
-category_path = ['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta']
+
 
 
 def ok():
