@@ -469,16 +469,13 @@ def got_em():
     find_category_in_results(cp[-1])
 
 def wait_for_loading_dialog():
-    loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
-        '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
-        )[1].get_attribute('id')
     try:
-        print("first wait")
+        loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+            '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+            )[1].get_attribute('id')
         WebDriverWait(driver, 7).until(  # Wait for Loading dialog to appear
             EC.visibility_of_element_located((By.ID, loading_id) ))
-        print("second wait")
         WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
             EC.invisibility_of_element_located((By.ID, loading_id) ))
-    except(TimeoutException):
-        print("caught")
-        pass
+    except(TimeoutException, IndexError):
+        print("No loading dialog found")
