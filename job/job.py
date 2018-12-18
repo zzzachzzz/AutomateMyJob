@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
@@ -349,9 +350,9 @@ def binary_search_web_element_list(arr: list, start: int, end: int,
 # binary_search_web_element_list(arr, 1, len(arr)-1, item)
 
 
-# Returns index of item in list of tr elements
+# Find and add category from results
 def find_category_in_results(item: str) -> int:
-    xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
+    xpath_to_all_tr = '//div[@class="x-panel-body x-grid-body' + \
         ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
         '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr'
 
@@ -359,9 +360,16 @@ def find_category_in_results(item: str) -> int:
         EC.presence_of_all_elements_located((By.XPATH, xpath_to_all_tr) ))
 
     index_of_item = binary_search_web_element_list(all_tr, 1, len(all_tr)-1,
-        (By.CSS_SELECTOR, 'td:nth-child(2)'), )
+        (By.CSS_SELECTOR, 'td:nth-child(2)'), item)
 
     if index_of_item != -1:  # Item found
+        all_tr[index_of_item].find_element_by_css_selector('td:nth-child(1) > div > div').click()
+        # Click Add to Selections
+        find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
+            '[text()="Add to Selections"]', by=By.XPATH).click()
+        # Click OK
+        find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
+            by=By.XPATH).click()
         return index_of_item
 
     if is_last_page_of_results():  # If on last page of results
@@ -398,6 +406,7 @@ def is_last_page_of_results() -> bool:
 
 # Example
 category_path = ['HWS Tier 3', 'Landing Page', 'A', 'heroImageHeaderTextCta']
+# Navigate to directory through sidebar
 def find_directory_in_sidebar(directory_path: List[str]) -> None:
     all_tr_xpath = (  # Sidebar "Category Tree"
         '//div[@class="x-panel-body x-grid-body x-panel-body-default x-panel-body-default x-layout-fit"]' + \
@@ -417,15 +426,11 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
         e.click()
 
         prev_all_tr_length = len(all_tr)-1
-        print(len(all_tr))
         # Custom wait function
         all_tr = wait.until(nodes_have_been_added((By.XPATH, all_tr_xpath),
                                          prev_all_tr_length))
-        print(len(all_tr))
         start = index_of_directory + 1
         end = len(all_tr)-1 - prev_all_tr_length + index_of_directory
-        print("Sleepy time :)")
-        time.sleep(2)
 
 
     # Upon clicking category, element is detached from DOM. Selector below necessary before another click
@@ -443,7 +448,37 @@ class nodes_have_been_added:
 
     def __call__(self, driver):
         elements = driver.find_elements(*self.locator)
-        if len(elements)-1 > prev_length:
-            return elements
+        if len(elements)-1 > self.prev_length:
+            self.prev_length = len(elements)-1
+            print(self.prev_length)
+            elements = wait.until(EC.presence_of_all_elements_located(self.locator))
+            print(len(elements)-1)
+            if len(elements)-1 == self.prev_length:
+                return elements
         else:
             return False
+
+def got_em():
+    # xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
+    #     ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
+    #     '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr'
+
+    cp = ['MARSHA Codes', 'N', 'NYCHW']
+    find_directory_in_sidebar(cp)
+    wait_for_loading_dialog()
+    find_category_in_results(cp[-1])
+
+def wait_for_loading_dialog():
+    loading_id = driver.find_elements(By.XPATH,  # For targeting Loading dialog
+        '//div[@class="x-mask-msg vui-loadmask x-layer x-mask-msg-default"]'
+        )[1].get_attribute('id')
+    try:
+        print("first wait")
+        WebDriverWait(driver, 7).until(  # Wait for Loading dialog to appear
+            EC.visibility_of_element_located((By.ID, loading_id) ))
+        print("second wait")
+        WebDriverWait(driver, 30).until(  # Wait for Loading dialog to disappear
+            EC.invisibility_of_element_located((By.ID, loading_id) ))
+    except(TimeoutException):
+        print("caught")
+        pass
