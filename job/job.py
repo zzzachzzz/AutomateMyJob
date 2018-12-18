@@ -412,23 +412,20 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
             e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR, 'td > div')
             e.click()
             return
-
         e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR,
             'td > div > img.x-tree-elbow-plus.x-tree-expander')
         e.click()
 
         prev_all_tr_length = len(all_tr)-1
         print(len(all_tr))
-        # Needs custom wait function that waits for the amount of elements to increase
-        all_tr = find_all_e_wait(all_tr_xpath, By.XPATH)
+        # Custom wait function
+        all_tr = wait.until(nodes_have_been_added((By.XPATH, all_tr_xpath),
+                                         prev_all_tr_length))
         print(len(all_tr))
         start = index_of_directory + 1
         end = len(all_tr)-1 - prev_all_tr_length + index_of_directory
         print("Sleepy time :)")
         time.sleep(2)
-
-
-
 
 
     # Upon clicking category, element is detached from DOM. Selector below necessary before another click
@@ -438,19 +435,15 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
     # When clicking "All Categories" to collapse, must click text, not the "-/+" img
 
 
+# Custom wait condition waits for number of nodes to increase
+class nodes_have_been_added:
+    def __init__(self, locator, prev_length):
+        self.locator = locator
+        self.prev_length = prev_length
 
-
-def ok():
-    curr_depth_len, start = len(tbody.find_elements_by_tag_name('tr')), 3
-    for depth in category_path:
-        for i in range(start, curr_depth_len):
-            e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div')
-            if e.text == depth:
-                if category_path.index(depth) == len(category_path)-1:  # If list item is the last of the list (index of -1)
-                    pass
-                elif category_path.index(depth) == len(category_path)-2:  # If list item is second to last (index of -2)
-                    e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div')
-                    e.click()
-                else:
-                    e = tbody.find_element_by_css_selector('tr:nth-child('+str(i)+') > td > div > img.x-tree-elbow-plus.x-tree-expander')
-                    e.click()
+    def __call__(self, driver):
+        elements = driver.find_elements(*self.locator)
+        if len(elements)-1 > prev_length:
+            return elements
+        else:
+            return False
