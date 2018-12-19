@@ -16,7 +16,7 @@ from typing import List
 from . import driver, wait
 from . import find_e, find_e_wait, find_all_e, find_all_e_wait
 from . import tagging_paths
-
+import pdb
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -335,6 +335,9 @@ def add_category():
 def binary_search_web_element_list(arr: list, start: int, end: int,
                                    selector_for_item: tuple, item: str) -> int:
     # If last element string is less than item string, item won't be in list.
+
+    # pdb.set_trace()
+
     if arr[end].find_element(*selector_for_item).text < item:
         return -1  # Element was not present
     while start <= end:
@@ -367,9 +370,6 @@ def find_category_in_results(item: str) -> int:
         # Click Add to Selections
         find_e('//span[contains(@id, "-category-button-add-btnInnerEl")]' + \
             '[text()="Add to Selections"]', by=By.XPATH).click()
-        # Click OK
-        find_e('//span[contains(@id, "-button-ok-btnInnerEl")]',
-            by=By.XPATH).click()
         return index_of_item
 
     if is_last_page_of_results():  # If on last page of results
@@ -421,6 +421,10 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
             e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR, 'td > div')
             e.click()
             return
+
+        # Consider targeting second to last img as well
+        # i = len(//td//div//img)-2
+        # Sometimes class is not begin found
         e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR,
             'td > div > img.x-tree-elbow-plus.x-tree-expander')
         e.click()
@@ -429,6 +433,7 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
         # Custom wait function
         all_tr = wait.until(nodes_have_been_added((By.XPATH, all_tr_xpath),
                                          prev_all_tr_length))
+        time.sleep(2)  # Possibly change poll time for custom wait function to 1 sec
         start = index_of_directory + 1
         end = len(all_tr)-1 - prev_all_tr_length + index_of_directory
 
@@ -458,15 +463,15 @@ class nodes_have_been_added:
         else:
             return False
 
-def got_em():
-    # xpath_to_tbody = '//div[@class="x-panel-body x-grid-body' + \
-    #     ' x-panel-body-default-framed x-panel-body-default-framed x-layout-fit"]' + \
-    #     '[contains(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr'
-
-    cp = ['MARSHA Codes', 'N', 'NYCHW']
+def got_em(cp):
+    # cp = ['MARSHA Codes', 'N', 'NYCHW']
     find_directory_in_sidebar(cp)
     wait_for_loading_dialog()
     find_category_in_results(cp[-1])
+
+    click_all_categories()  # To reset sidebar navigation
+    find_e('//span[contains(@id, "-button-ok-btnInnerEl")]', by=By.XPATH
+        ).click()  # Click OK
 
 def wait_for_loading_dialog():
     try:
@@ -479,3 +484,11 @@ def wait_for_loading_dialog():
             EC.invisibility_of_element_located((By.ID, loading_id) ))
     except(TimeoutException, IndexError):
         print("No loading dialog found")
+
+def click_all_categories():
+    all_categories_button_xpath = (  # Sidebar "Category Tree"
+        '//div[@class="x-panel-body x-grid-body x-panel-body-default x-panel-body-default x-layout-fit"]' + \
+        '[starts-with(@id, "vui-vcm-ui-picker-")]//div//table//tbody//tr[position()=2]//td//div')
+    find_e(all_categories_button_xpath, By.XPATH
+        ).click()
+

@@ -9,6 +9,8 @@ OH YOU COULD ALSO USE tuple() DUH THE PARENTHESIS ARE BEING EVALUATED DIFFERENTL
 class TaggingPaths:
     def __init__(self, page_type_locator: Tuple[str], marsha: str,
                  tile='', instance='', room_pool_code='', product_id=''):
+        self._page_type_locator = page_type_locator
+
         self._marsha = marsha
         self._tile = tile
         self._instance = instance
@@ -19,37 +21,37 @@ class TaggingPaths:
         self.Body = ['Text Length', 'MultiArticle', 'Body']
         self.Modal = ['Hotel Websites Placement', 'Link', 'Modal']
 
-        self.singleHeroImage = ['HWS Tier 3', *page_type_locator,
+        self.singleHeroImage = ['HWS Tier 3', *self._page_type_locator,
                                 'singleHeroImage']
-        self.heroTextOverlay = ['HWS Tier 3', *page_type_locator,
-                                'heroTextOverlay']
-        self.heroTitleLongDescriptionCta = ['HWS Tier 3', *page_type_locator,
+        self.heroTextOverlay = ['HWS Tier 3', *self._page_type_locator,
+                                'herotextOverlay']  # They didn't camelcase it
+        self.heroTitleLongDescriptionCta = ['HWS Tier 3', *self._page_type_locator,
                                             'heroTitleLongDescriptionCta']
-        self.titleSubtitleText = ['HWS Tier 3', *page_type_locator,
+        self.titleSubtitleText = ['HWS Tier 3', *self._page_type_locator,
                                   'titleSubtitleText']
-        self.headingTextListOfArticles = ['HWS Tier 3', *page_type_locator,
+        self.headingTextListOfArticles = ['HWS Tier 3', *self._page_type_locator,
                                           'headingTextListOfArticles']
-        self.headerTextCta = ['HWS Tier 3', *page_type_locator,
+        self.headerTextCta = ['HWS Tier 3', *self._page_type_locator,
                               'headerTextCta']
-        self.titleImage = ['HWS Tier 3', *page_type_locator, 'titleImage']
+        self.titleImage = ['HWS Tier 3', *self._page_type_locator, 'titleImage']
 
-        # page_type_locator is probably only ever ('Dining Details', )
-        self.restaurantOverview = ['HWS Tier 3', *page_type_locator,
+        # self._page_type_locator is probably only ever ('Dining Details', )
+        self.restaurantOverview = ['HWS Tier 3', *self._page_type_locator,
                                    'restaurantOverview']
-        # page_type_locator is probably only
+        # self._page_type_locator is probably only
         # ever ('Rooms & Suites', 'Room Details')
-        self.roomLongDescription = ['HWS Tier 3', *page_type_locator,
+        self.roomLongDescription = ['HWS Tier 3', *self._page_type_locator,
                                     'roomLongDescription']
-        # page_type_locator is probably only
+        # self._page_type_locator is probably only
         # ever ('Spa and Fitness', 'Fitness Details')
-        self.fitnessOverview = ['HWS Tier 3', *page_type_locator,
+        self.fitnessOverview = ['HWS Tier 3', *self._page_type_locator,
                                 'fitnessOverview']
-        # page_type_locator is probably only
+        # self._page_type_locator is probably only
         # ever ('Spa and Fitness', 'Spa Details')
-        self.spaOverview = ['HWS Tier 3', *page_type_locator,
+        self.spaOverview = ['HWS Tier 3', *self._page_type_locator,
                             'spaOverview']
-        # page_type_locator is probably only ever (Golf Details', )
-        self.golfOverview = ['HWS Tier 3', *page_type_locator,
+        # self._page_type_locator is probably only ever (Golf Details', )
+        self.golfOverview = ['HWS Tier 3', *self._page_type_locator,
                              'golfOverview']
 
     @property
@@ -69,52 +71,55 @@ class TaggingPaths:
     # Delegate product ID matching to a function in job.py
     @property
     def product_id(self):
-        # page_type_locator would unpack something like:
+        # self._page_type_locator would unpack something like:
         # ('Products Dining', ) or ('Products Spa', )
-        return [*page_type_locator, self._marsha[0],
+        return [*self._page_type_locator, self._marsha[0],
                 self._marsha, self._product_id]
 
     @property
     def heroImageHeaderTextCta(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'heroImageHeaderTextCta', self._tile]
 
     @property
     def imageClusterHeadingTextCta(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'imageClusterHeadingTextCta', self._tile]
 
     @property
-    def imageTextCarousel(self):
-        return ['HWS Tier 3', *page_type_locator,
-                'imageTextCarousel', self._tile]
-
-    @property
     def imageHeaderTextCtaAdvanced(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'imageHeaderTextCtaAdvanced', self._tile]
     
     @property
     def dividerImageText(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'dividerImageText', self._tile]
     
     @property
     def imageMosaicHeadingTextCta(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'imageMosaicHeadingTextCta', self._tile]
 
-    # Possibly need different tag for Layout B
-    # 'imageTextCtaCarouselDining'
+    @property
+    def imageTextCarousel(self):
+        return ['HWS Tier 3', *self._page_type_locator,
+                'imageTextCarousel', self._tile]
+
     @property
     def imageTextCtaCarousel(self):
-        return ['HWS Tier 3', *page_type_locator,
+        return ['HWS Tier 3', *self._page_type_locator,
                 'imageTextCtaCarousel', self._tile]
 
     @property
+    def imageTextCtaCarouselDining(self):    
+        return ['HWS Tier 3', *self._page_type_locator,
+                'imageTextCtaCarouselDining', self._tile]
+
+    @property
     def mapWhatsNearby(self):
-        return ['HWS Tier 3', *page_type_locator, 'mapWhatsNearby']
+        return ['HWS Tier 3', *self._page_type_locator, 'mapWhatsNearby']
 
     @property
     def video(self):
-        return ['HWS Tier 3', *page_type_locator, 'video', self._tile]
+        return ['HWS Tier 3', *self._page_type_locator, 'video', self._tile]
