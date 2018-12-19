@@ -425,8 +425,10 @@ def find_directory_in_sidebar(directory_path: List[str]) -> None:
         # Consider targeting second to last img as well
         # i = len(//td//div//img)-2
         # Sometimes class is not begin found
-        e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR,
-            'td > div > img.x-tree-elbow-plus.x-tree-expander')
+        # e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR,
+        #     'td > div > img.x-tree-elbow-plus.x-tree-expander')
+        e = all_tr[index_of_directory].find_elements(
+            By.CSS_SELECTOR, 'td > div > img')[-2]
         e.click()
 
         prev_all_tr_length = len(all_tr)-1
