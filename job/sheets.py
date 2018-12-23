@@ -3,8 +3,8 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 from pprint import pprint
 from typing import List
-from . import tagging_paths
-from . import marsha
+import re
+# from . import tagging_paths
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
@@ -21,25 +21,37 @@ def main():
         flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
         creds = tools.run_flow(flow, store)
     service = build('sheets', 'v4', http=creds.authorize(Http()))
-    # spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
-    # sheets = spreadsheet.get('sheets')
-    # sheet_names = get_sheet_names(sheets)
+    spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+    spreadsheet_title = spreadsheet.get('properties').get('title')
+    marsha = get_marsha(spreadsheet_title)
+    sheets = spreadsheet.get('sheets')
+    sheet_names = get_sheet_names(sheets)
 
     RANGE_NAME = generate_range_name('Hotel Overview') # sheet
-    # pprint(sheet_names)
-    result = service.spreadsheets().values().get(
-        spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+    print(spreadsheet_title)
+    print(marsha)
+    print(sheet_names)
+    print(RANGE_NAME)
+    # result = service.spreadsheets().values().get(
+    #     spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+
     # body = {
     #     'values': [['test']]
     # }
-
     # result = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, range=SAMPLE_RANGE_NAME,
     #     valueInputOption='USER_ENTERED', body=body).execute()
-    values = result.get('values')
-    pprint(values)
-    parsed = parse_for_content()
+
+    # values = result.get('values')
+    # pprint(values)
+    # parsed = parse_for_content()
     
     return
+
+
+def get_marsha(spreadsheet_title: str) -> str:
+    marsha = re.search('(?<=[-_ ])[A-Z]{5}|[A-Z]{5}(?=[-_ ])',
+        spreadsheet_title).group()
+    return marsha
 
 
 def generate_range_name(sheet: str) -> str:
@@ -47,7 +59,6 @@ def generate_range_name(sheet: str) -> str:
         range_name = sheet + '!N:N'
     else:
         range_name = sheet + '!D:D'
-    print("range_name:", range_name)
     return range_name
 
 
