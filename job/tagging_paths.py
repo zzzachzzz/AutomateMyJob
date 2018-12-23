@@ -1,4 +1,56 @@
 from typing import Tuple
+import json
+# from collections import OrderedDict
+
+
+PageTypeLocators = {
+    'Landing Page A' ('Landing Page', 'A'),
+    'Landing Page B': ('Landing Page', 'B'),
+    'Hotel Overview': ('Overview', ),
+    'Map & Directions': ('Overview', 'Map & Directions'),
+    'Rooms & Suites Overview': ('Rooms & Suites', ),
+    'Room Details': ('Rooms & Suites', 'Room Details'),
+    'Dining Details': ('Dining Details', ),
+    'Spa Details': ('Spa and Fitness', 'Spa Details'),
+    'Fitness Details': ('Spa and Fitness', 'Fitness Details'),
+    'Golf Details': ('Golf Details', ),
+}
+
+# ProductPaths = {}
+
+
+def get_room_pool_code(sheet_title: str) -> str:
+    with open('product_ids_and_rpcs.json', 'r') as file:
+        data = json.load(file)
+
+    return data['room_pool_codes'][sheet_title]
+
+
+def get_product_id(page_type: str, sheet_title: str) -> str:
+    with open('product_ids_and_rpcs.json', 'r') as file:
+        data = json.load(file)
+
+    return data['product_ids'][page_type][sheet_title]
+
+
+def get_page_type():
+    with open('product_ids_and_rpcs.json', 'r') as file:
+            data = json.load(file)
+
+    if data['room_pool_codes'].get(sheet_title) is not None:
+        return 'Room Details'
+
+    if data['product_ids']['Dining Details'].get(sheet_title) is not None:
+        return 'Dining Details'
+
+    if data['product_ids']['Spa Details'].get(sheet_title) is not None:
+        return 'Spa Details'
+
+    if data['product_ids']['Fitness Details'].get(sheet_title) is not None:
+        return 'Fitness Details'
+
+    if data['product_ids']['Golf Details'].get(sheet_title) is not None:
+        return 'Golf Details'
 
 
 """
@@ -6,16 +58,26 @@ If passing page_type_locator containing only one string in the tuple,
 pass parameter as such: tp = TaggingPaths(('string', ), 'marsha')
 OH YOU COULD ALSO USE tuple() DUH THE PARENTHESIS ARE BEING EVALUATED DIFFERENTLY
 """
+# class TaggingPaths:
+#     def __init__(self, page_type_locator: Tuple[str], marsha: str,
+#                  tile='', instance='', room_pool_code='', product_id=''):
 class TaggingPaths:
-    def __init__(self, page_type_locator: Tuple[str], marsha: str,
-                 tile='', instance='', room_pool_code='', product_id=''):
-        self._page_type_locator = page_type_locator
+    def __init__(self, sheet_title: str, marsha: str,
+                 tile='', instance=''):
+        if PageTypeLocators.get(sheet_title) is None:
+            page_type = get_page_type(sheet_title)
+            if page_type == 'Room Details':
+                self._room_pool_code = get_room_pool_code(sheet_title)
+            else:
+                self._product_id = get_product_id(sheet_title)
+        else:
+            page_type = sheet_title
+
+        self._page_type_locator = PageTypeLocators[page_type]        
 
         self._marsha = marsha
         self._tile = tile
         self._instance = instance
-        self._room_pool_code = room_pool_code
-        self._product_id = product_id
 
         self.Header = ['Text Length', 'MultiArticle', 'Header']
         self.Body = ['Text Length', 'MultiArticle', 'Body']
