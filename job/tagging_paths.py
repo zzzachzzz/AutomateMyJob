@@ -10,13 +10,28 @@ PageTypeLocators = {
     'Map & Directions': ('Overview', 'Map & Directions'),
     'Rooms & Suites Overview': ('Rooms & Suites', ),
     'Room Details': ('Rooms & Suites', 'Room Details'),
+    'Dining Overview': ('Dining', ),
     'Dining Details': ('Dining Details', ),
+    'Spa & Fitness Overview': ('Spa and Fitness', ),
     'Spa Details': ('Spa and Fitness', 'Spa Details'),
     'Fitness Details': ('Spa and Fitness', 'Fitness Details'),
+    'Area & Activities': ('Area & Activities', ),
+    'Golf Overview': ('Golf Club Overview', ),
     'Golf Details': ('Golf Details', ),
+    'Meetings': ('Meetings & Events', ),
+    'Weddings': ('Weddings & Occasions', ),
+    'Group Bookings': ('Group Bookings', ),
+    'Offers': ('Offers', ),
+    'Generic Subpage': ('', ),  #TODO
+    'Generic Primary': ('', ),  #TODO
 }
 
-# ProductPaths = {}
+ProductLocators = {
+    'Dining Details': 'Products Dining',
+    'Spa Details': 'Products Spa',
+    'Fitness Details': 'Products Fitness',
+    'Golf Details': 'Products Golf Courses',
+}
 
 
 def get_room_pool_code(sheet_title: str) -> str:
@@ -33,9 +48,9 @@ def get_product_id(page_type: str, sheet_title: str) -> str:
     return data['product_ids'][page_type][sheet_title]
 
 
-def get_page_type():
+def get_page_type() -> str:
     with open('product_ids_and_rpcs.json', 'r') as file:
-            data = json.load(file)
+        data = json.load(file)
 
     if data['room_pool_codes'].get(sheet_title) is not None:
         return 'Room Details'
@@ -51,29 +66,26 @@ def get_page_type():
 
     if data['product_ids']['Golf Details'].get(sheet_title) is not None:
         return 'Golf Details'
+    return None
 
 
 """
 If passing page_type_locator containing only one string in the tuple,
 pass parameter as such: tp = TaggingPaths(('string', ), 'marsha')
-OH YOU COULD ALSO USE tuple() DUH THE PARENTHESIS ARE BEING EVALUATED DIFFERENTLY
 """
-# class TaggingPaths:
-#     def __init__(self, page_type_locator: Tuple[str], marsha: str,
-#                  tile='', instance='', room_pool_code='', product_id=''):
 class TaggingPaths:
     def __init__(self, sheet_title: str, marsha: str,
                  tile='', instance=''):
         if PageTypeLocators.get(sheet_title) is None:
-            page_type = get_page_type(sheet_title)
+            self._page_type = get_page_type(sheet_title)
             if page_type == 'Room Details':
                 self._room_pool_code = get_room_pool_code(sheet_title)
             else:
                 self._product_id = get_product_id(sheet_title)
         else:
-            page_type = sheet_title
+            self._page_type = sheet_title
 
-        self._page_type_locator = PageTypeLocators[page_type]        
+        self._page_type_locator = PageTypeLocators[self._page_type]
 
         self._marsha = marsha
         self._tile = tile
@@ -129,13 +141,12 @@ class TaggingPaths:
         return ['Property Information', 'Room Codes',
                 'Room Pool Codes', self._room_pool_code]
 
-    # TODO Needs work
     # Delegate product ID matching to a function in job.py
     @property
     def product_id(self):
-        # self._page_type_locator would unpack something like:
-        # ('Products Dining', ) or ('Products Spa', )
-        return [*self._page_type_locator, self._marsha[0],
+        # ProductLocators.get(self._page_type) gets string like
+        # 'Products Dining' or 'Products Spa'.
+        return [ProductLocators.get(self._page_type), self._marsha[0],
                 self._marsha, self._product_id]
 
     @property
