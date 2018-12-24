@@ -4,7 +4,7 @@ import json
 
 
 PageTypeLocators = {
-    'Landing Page A' ('Landing Page', 'A'),
+    'Landing Page A': ('Landing Page', 'A'),
     'Landing Page B': ('Landing Page', 'B'),
     'Hotel Overview': ('Overview', ),
     'Map & Directions': ('Overview', 'Map & Directions'),
