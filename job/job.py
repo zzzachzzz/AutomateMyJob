@@ -15,7 +15,7 @@ import re
 from typing import List
 from . import driver, wait
 from . import find_e, find_e_wait, find_all_e, find_all_e_wait
-from . import tagging_paths
+import tagging_paths
 import pdb
 
 logger = logging.getLogger(__name__)
