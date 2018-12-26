@@ -78,49 +78,42 @@ def get_sheet_names(sheets: list) -> list:
         sheet_names.append(title)
     return sheet_names
 
-def parse_for_content(sheet_title: str, values: List[List[str]]) -> list:
+def parse_for_content(sheet_title: str, marsha: str, values: List[List[str]]) -> list:
     def complete_build_sequence_piece():
         pass
-    marsha = 'TCISI'
-    tp = tagging_paths.TaggingPaths(sheet_title, marsha)
+    b = build.Build(sheet_title, marsha)
+    cif = build.CIF(b)
 
-    B = build.Build[sheet_title]  # Dictionary with build details
+
     content_identifiers = build.content_identifiers
     build_sequence = []
-    card = sub_card = content = ''
     i = 0
     # while i <= len(values)-1:
-    while i <= 7:
+    while i <= 123:
         # If blank cell, shouldn't be any after previous filter
         if values[i] == '':
             i += 1
-        # If card identifier
-        elif values[i] in B:  # 'Intro (A)' in 'Hotel Overview'
-            type_ = B.get(values[i]).get('type')
-            if type_:
-                build_sequence.append(B.get(values[i]))
-                pprint(build_sequence)
-            else:
-                card = values[i]
+
+        elif values[i] in cif.names: 
+            build_sequence.append( cif.names[values[i]] )
             i += 1
-        # If sub-card identifier
-        elif values[i] in B.get(card, {}):
-            sub_card = values[i]
-            i += 1
+
         # If content identifier
-        # elif values[i] in build_sequence[-1]['ref']
-        elif values[i] in content_identifiers:
-            if values[i+1] != '':  # Has content in next cell, current is content identifier
-                if values[i] in build_sequence[-1].get('ref', []):
-                    ref_index = build_sequence[-1]['ref'].index(values[i])
-                if 'type' in build_sequence[-1]:
-                    build_sequence[-1]['ref'][ref_index] = { values[i]: values[i+1] }
-                elif 'type' in build_sequence[-1].get(sub_card, {}):
-                    build_sequence[-1][sub_card]['ref'][ref_index] = { values[i]: values[i+1] }
+        elif values[i] in content_identifiers and values[i+1] != '':
+            for component in build_sequence[-1]:
+                if component['type'] == 'article':
+                    if component.get('title') == values[i]:
+                        component['title'] = values[i+1]
+                    elif component.get('body') == values[i]:
+                        component['body'] = values[i+1]
+                elif component['type'] == 'wrapper':
+                    if values[i] in component['ref']:
+                        ref_index = component['ref'].index(values[i])
+                        component['ref'][ref_index] = values[i+1]
             i += 2
+
         else:
             i += 1
-        
 
     return build_sequence
 
@@ -132,6 +125,6 @@ if __name__ == '__main__':
         values = pickle.load(pickle_file)
     pprint(values)
     print("\n\n")
-    parsed = parse_for_content('Hotel Overview', values)
+    parsed = parse_for_content('Hotel Overview', 'TCISI', values)
     print("\n\n\nFinal:")
-    print(parsed)
+    pprint(parsed)
