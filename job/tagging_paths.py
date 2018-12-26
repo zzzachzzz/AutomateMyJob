@@ -1,6 +1,5 @@
 from typing import Tuple
 import json
-# from collections import OrderedDict
 
 
 PageTypeLocators = {
@@ -25,6 +24,7 @@ PageTypeLocators = {
     'Generic Subpage': ('', ),  #TODO
     'Generic Primary': ('', ),  #TODO
 }
+
 
 ProductLocators = {
     'Dining Details': 'Products Dining',
@@ -74,8 +74,7 @@ If passing page_type_locator containing only one string in the tuple,
 pass parameter as such: tp = TaggingPaths(('string', ), 'marsha')
 """
 class TaggingPaths:
-    def __init__(self, sheet_title: str, marsha: str,
-                 tile='', instance=''):
+    def __init__(self, sheet_title: str, marsha: str):
         if PageTypeLocators.get(sheet_title) is None:
             self._page_type = get_page_type(sheet_title)
             if page_type == 'Room Details':
@@ -88,8 +87,7 @@ class TaggingPaths:
         self._page_type_locator = PageTypeLocators[self._page_type]
 
         self._marsha = marsha
-        self._tile = tile
-        self._instance = instance
+        self.marsha = ['MARSHA Codes', marsha[0], marsha]
 
         self.Header = ['Text Length', 'MultiArticle', 'Header']
         self.Body = ['Text Length', 'MultiArticle', 'Body']
@@ -127,72 +125,53 @@ class TaggingPaths:
         # self._page_type_locator is probably only ever (Golf Details', )
         self.golfOverview = ['HWS Tier 3', *self._page_type_locator,
                              'golfOverview']
+        self.mapWhatsNearby = ['HWS Tier 3', *self._page_type_locator, 'mapWhatsNearby']
 
-    @property
-    def marsha(self):
-        return ['MARSHA Codes', self._marsha[0], self._marsha]
+    def instance(self, instance):
+        return ['Instance', instance]
 
-    @property
-    def instance(self):
-        return ['Instance', self._instance]
-
-    @property
     def room_pool_code(self):
         return ['Property Information', 'Room Codes',
                 'Room Pool Codes', self._room_pool_code]
 
     # Delegate product ID matching to a function in job.py
-    @property
     def product_id(self):
         # ProductLocators.get(self._page_type) gets string like
         # 'Products Dining' or 'Products Spa'.
         return [ProductLocators.get(self._page_type), self._marsha[0],
                 self._marsha, self._product_id]
 
-    @property
-    def heroImageHeaderTextCta(self):
+    def heroImageHeaderTextCta(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'heroImageHeaderTextCta', self._tile]
+                'heroImageHeaderTextCta', tile]
 
-    @property
-    def imageClusterHeadingTextCta(self):
+    def imageClusterHeadingTextCta(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageClusterHeadingTextCta', self._tile]
+                'imageClusterHeadingTextCta', tile]
 
-    @property
-    def imageHeaderTextCtaAdvanced(self):
+    def imageHeaderTextCtaAdvanced(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageHeaderTextCtaAdvanced', self._tile]
+                'imageHeaderTextCtaAdvanced', tile]
     
-    @property
-    def dividerImageText(self):
+    def dividerImageText(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'dividerImageText', self._tile]
+                'dividerImageText', tile]
     
-    @property
-    def imageMosaicHeadingTextCta(self):
+    def imageMosaicHeadingTextCta(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageMosaicHeadingTextCta', self._tile]
+                'imageMosaicHeadingTextCta', tile]
 
-    @property
-    def imageTextCarousel(self):
+    def imageTextCarousel(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageTextCarousel', self._tile]
+                'imageTextCarousel', tile]
 
-    @property
-    def imageTextCtaCarousel(self):
+    def imageTextCtaCarousel(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageTextCtaCarousel', self._tile]
+                'imageTextCtaCarousel', tile]
 
-    @property
-    def imageTextCtaCarouselDining(self):    
+    def imageTextCtaCarouselDining(self, tile):    
         return ['HWS Tier 3', *self._page_type_locator,
-                'imageTextCtaCarouselDining', self._tile]
+                'imageTextCtaCarouselDining', tile]
 
-    @property
-    def mapWhatsNearby(self):
-        return ['HWS Tier 3', *self._page_type_locator, 'mapWhatsNearby']
-
-    @property
-    def video(self):
-        return ['HWS Tier 3', *self._page_type_locator, 'video', self._tile]
+    def video(self, tile):
+        return ['HWS Tier 3', *self._page_type_locator, 'video', tile]
