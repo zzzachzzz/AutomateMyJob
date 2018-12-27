@@ -35,21 +35,21 @@ ProductLocators = {
 
 
 def get_room_pool_code(sheet_title: str) -> str:
-    with open('product_ids_and_rpcs.json', 'r') as file:
+    with open('job/product_ids_and_rpcs.json', 'r') as file:
         data = json.load(file)
 
     return data['room_pool_codes'][sheet_title]
 
 
 def get_product_id(page_type: str, sheet_title: str) -> str:
-    with open('product_ids_and_rpcs.json', 'r') as file:
+    with open('job/product_ids_and_rpcs.json', 'r') as file:
         data = json.load(file)
 
     return data['product_ids'][page_type][sheet_title]
 
 
-def get_page_type() -> str:
-    with open('product_ids_and_rpcs.json', 'r') as file:
+def get_page_type(sheet_title: str) -> str:
+    with open('job/product_ids_and_rpcs.json', 'r') as file:
         data = json.load(file)
 
     if data['room_pool_codes'].get(sheet_title) is not None:
@@ -77,10 +77,10 @@ class TaggingPaths:
     def __init__(self, sheet_title: str, marsha: str):
         if PageTypeLocators.get(sheet_title) is None:
             self._page_type = get_page_type(sheet_title)
-            if page_type == 'Room Details':
+            if self._page_type == 'Room Details':
                 self._room_pool_code = get_room_pool_code(sheet_title)
             else:
-                self._product_id = get_product_id(sheet_title)
+                self._product_id = get_product_id(self._page_type, sheet_title)
         else:
             self._page_type = sheet_title
 

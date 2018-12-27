@@ -47,7 +47,7 @@ def main():
     # Get rid of lists within the list
     values = [x[0] if len(x) > 0 else '' for x in values]
     pprint(values)
-    with open('values.pickle', 'wb') as pickle_file:
+    with open('job/values.pickle', 'wb') as pickle_file:
         pickle.dump(values, pickle_file)
     print("\n\n\n")
 
@@ -121,7 +121,7 @@ def parse_for_content(sheet_title: str, marsha: str, values: List[List[str]]) ->
 
 if __name__ == '__main__':
     # main()
-    with open('values.pickle', 'rb') as pickle_file:
+    with open('job/values.pickle', 'rb') as pickle_file:
         values = pickle.load(pickle_file)
     pprint(values)
     print("\n\n")

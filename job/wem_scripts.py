@@ -52,7 +52,7 @@ colorama.init(autoreset=True)
 
 
 def login():
-    with open('creds.json', 'r') as file:
+    with open('job/creds.json', 'r') as file:
         creds = json.load(file)
     e = find_e('#vui-login-name-inputEl')
     e.send_keys(creds['user'])
