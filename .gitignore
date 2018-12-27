@@ -1,3 +1,4 @@
+*.pickle
 token.json
 credentials.json
 creds.json
