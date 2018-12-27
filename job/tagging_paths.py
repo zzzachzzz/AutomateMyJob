@@ -75,6 +75,8 @@ pass parameter as such: tp = TaggingPaths(('string', ), 'marsha')
 """
 class TaggingPaths:
     def __init__(self, sheet_title: str, marsha: str):
+        self._room_pool_code = None
+        self._product_id = None
         if PageTypeLocators.get(sheet_title) is None:
             self._page_type = get_page_type(sheet_title)
             if self._page_type == 'Room Details':
@@ -127,19 +129,16 @@ class TaggingPaths:
                              'golfOverview']
         self.mapWhatsNearby = ['HWS Tier 3', *self._page_type_locator, 'mapWhatsNearby']
 
-    def instance(self, instance):
-        return ['Instance', instance]
-
-    def room_pool_code(self):
-        return ['Property Information', 'Room Codes',
-                'Room Pool Codes', self._room_pool_code]
-
-    # Delegate product ID matching to a function in job.py
-    def product_id(self):
+        self.room_pool_code = ['Property Information', 'Room Codes',
+                               'Room Pool Codes', self._room_pool_code]
+        # Delegate product ID matching to a function in job.py
         # ProductLocators.get(self._page_type) gets string like
         # 'Products Dining' or 'Products Spa'.
-        return [ProductLocators.get(self._page_type), self._marsha[0],
-                self._marsha, self._product_id]
+        self.product_id = [ProductLocators.get(self._page_type),
+                           self._marsha[0], self._marsha, self._product_id]
+
+    def instance(self, instance):
+        return ['Instance', instance]    
 
     def heroImageHeaderTextCta(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,

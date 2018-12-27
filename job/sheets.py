@@ -94,8 +94,8 @@ def parse_for_content(sheet_title: str, marsha: str, values: List[List[str]]) ->
         if values[i] == '':
             i += 1
 
-        elif values[i] in cif.names: 
-            build_sequence.append( cif.names[values[i]] )
+        elif values[i] in cif.names:
+            build_sequence.append( cif.names[values[i]]() )
             i += 1
 
         # If content identifier
