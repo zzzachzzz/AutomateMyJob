@@ -13,10 +13,10 @@ import json
 import time
 import re
 from typing import List
-from . import driver, wait
-from . import find_e, find_e_wait, find_all_e, find_all_e_wait
-import tagging_paths
-import pdb
+from job import driver, wait
+from job.alias_util_functions import find_e, find_e_wait, find_all_e, find_all_e_wait
+from job import tagging_paths
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
