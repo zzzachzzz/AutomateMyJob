@@ -5,7 +5,8 @@ from pprint import pprint
 from typing import List
 import re
 from job import build
-from job import tagging_paths
+from job import cif_names_to_build
+from job.tagging_paths import get_page_type
 import pickle
 
 # If modifying these scopes, delete the file token.json.
@@ -81,8 +82,12 @@ def get_sheet_names(sheets: list) -> list:
 def parse_for_content(sheet_title: str, marsha: str, values: List[List[str]]) -> list:
     def complete_build_sequence_piece():
         pass
+
     b = build.Build(sheet_title, marsha)
-    cif = build.CIF(b)
+    # Get the specific subclass of CIF needed based on page_type
+    page_type = get_page_type(sheet_title)
+    TargetClass = getattr(cif_names_to_build, page_type.replace(' ', '') )
+    cif = TargetClass(b)
 
 
     content_identifiers = build.content_identifiers
