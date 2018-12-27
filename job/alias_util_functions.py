@@ -1,6 +1,6 @@
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from . import driver, wait
+from job import driver, wait
 
 """
 Alias methods for shortened name

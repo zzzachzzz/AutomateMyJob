@@ -1,4 +1,4 @@
-import tagging_paths
+from job import tagging_paths
 
 content_identifiers = {
     'Image URL',

@@ -4,8 +4,8 @@ from oauth2client import file, client, tools
 from pprint import pprint
 from typing import List
 import re
-import build
-import tagging_paths
+from job import build
+from job import tagging_paths
 import pickle
 
 # If modifying these scopes, delete the file token.json.
