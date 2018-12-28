@@ -19,6 +19,7 @@ class CIF:
             'Messaging Carousel Card 1':  lambda: b.imageTextCarousel('Tile A', '01'),
             'Messaging Carousel Card 2':  lambda: b.imageTextCarousel('Tile A', '02'),
             'Messaging Carousel Card 3':  lambda: b.imageTextCarousel('Tile A', '03'),
+            'Marketing Message (D)': lambda: b.headerTextCta(),
         }
 
 class RoomDetails(CIF):
@@ -26,4 +27,5 @@ class RoomDetails(CIF):
         super().__init__(b)
         self.names.update({
             'Intro (A)': lambda: b.roomLongDescription(),
+            'Room Highlights - Editorial (B)': lambda: b.headingTextListOfArticles(),
         })

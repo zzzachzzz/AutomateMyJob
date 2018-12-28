@@ -1,9 +1,11 @@
 {
     "room_pool_codes": {
-        "Deluxe Room 1 King Bed": 4392109348
+        "Deluxe Room 1 King Bed": "DXKB"
     },
     "product_ids": {
-        "Dining Details": {},
+        "Dining Details": {
+            "Feast": "4392109348"
+        },
         "Spa Details": {},
         "Fitness Details": {},
         "Golf Details": {}
