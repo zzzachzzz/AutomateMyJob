@@ -13,7 +13,7 @@ import json
 import time
 import re
 from typing import List
-from job import driver, wait
+from job.run import driver, wait
 from job.alias_util_functions import find_e, find_e_wait, find_all_e, find_all_e_wait
 from job import tagging_paths
 
