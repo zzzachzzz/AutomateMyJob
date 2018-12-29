@@ -128,7 +128,7 @@ class Build:
             {
                 'type': 'article',
                 'name': self._marsha+'_'+self.sheet_title+'roomLongDescription',
-                'tags': [self.tp.roomLongDescription, self.tp.room_pool_code] + self.base_tags,
+                'tags': [self.tp.roomLongDescription] + self.base_tags,
                 'body': 'Intro Copy (No character limit)',
             },
         ]
@@ -210,6 +210,31 @@ class Build:
 
         ]
 
+    def restaurantOverview(self):
+        return [
+            {
+                'type': 'article',
+                'name': self._marsha+'_'+self.sheet_title+'_restaurantOverview',
+                'tags': [self.tp.restaurantOverview] + self.base_tags,
+                'body': 'Intro Copy (No character limit)',
+            },
+        ]
+
+    def heroImageHeaderTextCta(self, tile):
+        return [
+            {
+                'type': 'article',
+                'name': self._marsha+'_'+self.sheet_title+'_heroImageHeaderTextCta_'+tile.replace(' ', ''),
+                'tags': [self.tp.heroImageHeaderTextCta(tile)] + self.base_tags,
+                'title': 'Tile Title (60-80 characters)',
+                'body': 'Tile Body Copy (144-160 characters )',
+            },
+            # {
+            #     'type': 'image',
+            #     'tags': [self.tp.heroImageHeaderTextCta(tile)] + self.base_tags,
+            #     'image': 'Image URL',
+            # },
+        ]
 
 
 
