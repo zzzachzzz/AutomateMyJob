@@ -1,0 +1,787 @@
+{
+    "majorDimension": "ROWS",
+    "range": "'Spa Details'!D1:F1000",
+    "values": [
+        [],
+        [
+            "Spa Details"
+        ],
+        [
+            "(link to Style guide)"
+        ],
+        [],
+        [
+            "Hotel must duplicate this page template and complete one for each onsite Spa as listed in EPIC. Each Spa will have its own page.\nIf hotel has 2 onsite Spas, it will need to create 2 versions of this page."
+        ],
+        [],
+        [
+            "Page Dependancies"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Hero Image"
+        ],
+        [
+            "Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-1478"
+        ],
+        [],
+        [],
+        [
+            "Intro (A)"
+        ],
+        [
+            "Section is required"
+        ],
+        [],
+        [
+            "Page Title"
+        ],
+        [
+            "Spa Eutonos"
+        ],
+        [
+            "11"
+        ],
+        [],
+        [
+            "Intro Copy (No character limit)"
+        ],
+        [
+            "Immerse in an authentic harmony and wellness haven in the south of Tenerife. Spa Eutonos is inspired in the essence of the islands where time slows down and invites to enjoy the present moment.\nElegant wood and limestone nuances combine with smooth textures creating a relaxing atmosphere. It\u2019s over 1800 m2 has interior and exterior areas, a state-of-the-arts thermal circuit and 10 treatment cabins for rituals for individuals or couples."
+        ],
+        [
+            "440"
+        ],
+        [],
+        [],
+        [
+            "Fitness Center Logo"
+        ],
+        [
+            "Logo URL"
+        ],
+        [],
+        [],
+        [],
+        [
+            "Vertical Interstitial Photo (B)"
+        ],
+        [
+            "Image URL",
+            "",
+            "Replaced:"
+        ],
+        [
+            "tcisi-spa-eutonos-5483",
+            "",
+            "None"
+        ],
+        [],
+        [],
+        [
+            "Primary Feature (D)"
+        ],
+        [
+            "Section is Optional. If used, fields marked in red are required for each tile used."
+        ],
+        [],
+        [
+            "Primary Feature Card 1"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [
+            "tcisi-spa-5919"
+        ],
+        [],
+        [
+            "Bottom Left Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-5899"
+        ],
+        [],
+        [
+            "Bottom Right Image URL"
+        ],
+        [],
+        [],
+        [
+            "Bottom Center Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [
+            "Relaxing Massages"
+        ],
+        [
+            "17"
+        ],
+        [],
+        [
+            "Card Subhead (30-60 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [
+            "At Spa Eutonos we have the treatment you need to feel better. Pamper yourself with one of our relaxing massages or let yourself experience the luxury of our wellbeing and health holistic rituals."
+        ],
+        [
+            "195"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Content List ( E )"
+        ],
+        [
+            "Section is Optional. If used, fields marked in red are required for each tile used."
+        ],
+        [],
+        [
+            "List Title (60-80 characters)"
+        ],
+        [
+            "Spa Services & Facilities"
+        ],
+        [
+            "25"
+        ],
+        [],
+        [
+            "If buttons are used, List cards will link to (select one):"
+        ],
+        [],
+        [],
+        [
+            "Tertiary Card 1"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-5898"
+        ],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [
+            "Vitality Pool"
+        ],
+        [
+            "13"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [
+            "Thalasso vitality pool with hydrotherapy body jets, floor jets, reclining loungers and swan necks."
+        ],
+        [
+            "98"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 2"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-5482"
+        ],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [
+            "Relaxation Areas"
+        ],
+        [
+            "16"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [
+            "Inside and outside relaxation areas with several plunge pools."
+        ],
+        [
+            "62"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 3"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-5899"
+        ],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [
+            "Treatment Rooms"
+        ],
+        [
+            "15"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [
+            "10 treatment rooms including a double room with hammam and Jacuzzi."
+        ],
+        [
+            "67"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 4"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [
+            "Additional Facilities"
+        ],
+        [
+            "21"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [
+            "Steam room, sauna, ice igloo and life-style showers."
+        ],
+        [
+            "52"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 5"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 6"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 7"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 8"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 9"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [
+            "Tertiary Card 10"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text. If \"Modal\" is selected at the top of this list, use the Modal form to the right)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Vertical Interstitial Photo (G)"
+        ],
+        [
+            "Image URL"
+        ],
+        [
+            "tcisi-spa-eutonos-5900"
+        ],
+        [],
+        [],
+        [
+            "Marketing Message (H)"
+        ],
+        [
+            "Section is Optional. If used, fields marked in red are required for each tile used."
+        ],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Title (30-60 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Messaging Carousel (I)"
+        ],
+        [
+            "Section is Optional. If used, fields marked in red are required for each tile used."
+        ],
+        [],
+        [
+            "Messaging Carousel Card 1"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text)"
+        ],
+        [],
+        [],
+        [],
+        [
+            "Messaging Carousel Card 2"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text)"
+        ],
+        [],
+        [],
+        [],
+        [
+            "Messaging Carousel Card 3"
+        ],
+        [
+            "Main Image URL"
+        ],
+        [],
+        [],
+        [
+            "Card Title (60-80 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Body Copy (144-160 characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "Card Button Copy (XX characters)"
+        ],
+        [],
+        [
+            "0"
+        ],
+        [],
+        [
+            "What Page Should Button Link To? (URL or descriptive text)"
+        ],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+            "Page Metadata"
+        ],
+        [],
+        [],
+        [
+            "**ADD FIELDS HERE"
+        ]
+    ]
+}
