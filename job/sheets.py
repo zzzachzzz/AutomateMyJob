@@ -3,6 +3,7 @@ from httplib2 import Http
 from oauth2client import file, client, tools
 from pprint import pprint
 import re
+import json
 
 
 # If modifying these scopes, delete the file token.json.
@@ -13,10 +14,10 @@ SPREADSHEET_ID = '1H_YWddeM8KaYQf7chWodWb1zUF8tjFz2qxvoKpNYztY'
 
 
 def main():
-    store = file.Storage('token.json')
+    store = file.Storage('job/token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+        flow = client.flow_from_clientsecrets('job/credentials.json', SCOPES)
         creds = tools.run_flow(flow, store)
     service = googleapiclient_build('sheets', 'v4', http=creds.authorize(Http()))
     spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
@@ -25,7 +26,7 @@ def main():
     sheets = spreadsheet.get('sheets')
     sheet_names = get_sheet_names(sheets)
 
-    RANGE_NAME = generate_range_name('Hotel Overview') # sheet
+    RANGE_NAME = generate_range_name('Spa Detail') # sheet
     print(spreadsheet_title)
     print(marsha)
     print(sheet_names)
@@ -33,6 +34,10 @@ def main():
     print("\n\n\n")
     result = service.spreadsheets().values().get(
         spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
+
+    with open('job/resultSample.json', 'w') as f:
+        json.dump(result, f, indent=4)
+    return
     """ For Updating Sheets
     body = {
         'values': [['test']]
@@ -62,9 +67,9 @@ def get_marsha(spreadsheet_title: str) -> str:
 
 def generate_range_name(sheet: str) -> str:
     if sheet == 'Landing Page B':
-        range_name = sheet + '!N:N'
+        range_name = sheet + '!N:P'
     else:
-        range_name = sheet + '!D:D'
+        range_name = sheet + '!D:F'
     return range_name
 
 
