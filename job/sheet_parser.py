@@ -30,6 +30,8 @@ def complete_build_section(build_section: List[dict], content_identifiers: Set[s
                 cleaned_build_section.append(cleaned_build_component)
 
         elif component['type'] == 'wrapper':
+            # if not in content_identifiers or in
+            # VCMID lookup -> {TCISI_imageHeaderAsdf_Article : VCM39232ID,}
             cleaned_build_component['ref'] = [x for x in component['ref'] if x not in content_identifiers]
             if len(cleaned_build_component['ref']) > 0:
                 cleaned_build_section.append(cleaned_build_component)
@@ -79,8 +81,7 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
     build_sequence = []
     content_identifiers = set()
     i = 0
-    # while i <= len(values)-1:
-    while i <= 123:
+    while i <= len(values)-1:
         if values[i] == '':
             i += 1
 
@@ -95,7 +96,6 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
             content_identifiers = get_content_identifiers(build_sequence[-1])
             i += 1
 
-        # If content identifier
         elif values[i] in content_identifiers and values[i+1] != '':
             for component in build_sequence[-1]:
                 if component['type'] == 'article':
