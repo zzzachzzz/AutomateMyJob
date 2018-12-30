@@ -148,6 +148,10 @@ class TaggingPaths:
         return ['HWS Tier 3', *self._page_type_locator,
                 'heroImageHeaderTextCta', tile]
 
+    def imageHeaderTextCta(self, tile):
+        return ['HWS Tier 3', *self._page_type_locator,
+                'imageHeaderTextCta', tile]
+
     def imageClusterHeadingTextCta(self, tile):
         return ['HWS Tier 3', *self._page_type_locator,
                 'imageClusterHeadingTextCta', tile]

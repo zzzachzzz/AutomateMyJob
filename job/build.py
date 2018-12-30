@@ -33,7 +33,7 @@ class Build:
         else:
             self.base_tags = [self.tp.marsha]
 
-    def singleHeroImage(self):
+    def singleHeroImageWrapper(self):
         return [
             {
                 'type': 'wrapper',
@@ -42,6 +42,16 @@ class Build:
                 'ref': [
                     'Image URL',
                 ],
+            },
+        ]
+
+    def singleHeroImage(self):
+        return [
+            {
+                'type': 'image',
+                'name': self._marsha+'_'+self.sheet_title+'_singleHeroImage',
+                'tags': [self.tp.singleHeroImage] + self.base_tags,
+                'image': 'Image URL',
             },
         ]
 
@@ -229,12 +239,44 @@ class Build:
                 'title': 'Tile Title (60-80 characters)',
                 'body': 'Tile Body Copy (144-160 characters )',
             },
-            # {
-            #     'type': 'image',
-            #     'tags': [self.tp.heroImageHeaderTextCta(tile)] + self.base_tags,
-            #     'image': 'Image URL',
-            # },
+            {
+                'type': 'image',
+                'name': self._marsha+'_'+self.sheet_title+'_heroImageHeaderTextCta_'+tile.replace(' ', ''),
+                'tags': [self.tp.heroImageHeaderTextCta(tile)] + self.base_tags,
+                'image': 'Image URL',
+            },
         ]
+
+
+    def imageHeaderTextCtaTitle(self):
+        return [
+            {
+                'type': 'article',
+                'name': self._marsha+'_'+self.sheet_title+'_imageHeaderTextCta_Title',
+                'tags': [self.tp.imageHeaderTextCta('Title')] + self.base_tags,
+                'title': 'List Title (60-80 characters)',
+            },
+        ]
+
+    def imageHeaderTextCta(self, tile):
+        return [
+            {
+                'type': 'article',
+                'name': self._marsha+'_'+self.sheet_title+'_imageHeaderTextCta_'+tile.replace(' ', '')+'_Article',
+                'title': 'Card Title (60-80 characters)',
+                'body': 'Card Body Copy (144-160 characters)',
+            },
+            {
+                'type': 'wrapper',
+                'name': self._marsha+'_'+self.sheet_title+'_imageHeaderTextCta_'+tile.replace(' ', ''),
+                'tags': [self.tp.imageHeaderTextCta(tile)] + self.base_tags,
+                'ref': [
+                    'Main Image URL',
+                    self._marsha+'_'+self.sheet_title+'_imageHeaderTextCta_'+tile.replace(' ', '')+'_Article',
+                ]
+            },
+        ]
+
 
 
 

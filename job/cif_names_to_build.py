@@ -2,7 +2,7 @@
 class CIF:
     def __init__(self, b: 'Build'):
         self.names = {
-            'Hero Image': lambda: b.singleHeroImage(),
+            'Hero Image': lambda: b.singleHeroImageWrapper(),
             'Intro (A)': lambda: b.titleSubtitleText(),
             'Primary Feature Card 1 (B)': lambda: b.imageClusterHeadingTextCta('Tile A'),
             'Primary Feature Card 2 (B)': lambda: b.imageClusterHeadingTextCta('Tile B'),
@@ -47,6 +47,29 @@ class DiningDetails(CIF):
         super().__init__(b)
         self.names.update({
             'Intro (A)': lambda: b.restaurantOverview()
+        })
+
+
+class SpaDetails(CIF):
+    def __init__(self, b):
+        super().__init__(b)
+        self.names.update({
+            'Hero Image': lambda: b.singleHeroImage(),
+            'Vertical Interstitial Photo (B)': lambda: b.heroImageHeaderTextCta('Tile A'),
+            'Primary Feature Card 1': lambda: b.imageMosaicHeadingTextCta('Tile A'),
+            'Tertiary Content List ( E )': lambda: b.imageHeaderTextCtaTitle(),
+            'Tertiary Card 1': lambda: b.imageHeaderTextCta('Tile A'),
+            'Tertiary Card 2': lambda: b.imageHeaderTextCta('Tile B'),
+            'Tertiary Card 3': lambda: b.imageHeaderTextCta('Tile C'),
+            'Tertiary Card 4': lambda: b.imageHeaderTextCta('Tile D'),
+            'Tertiary Card 5': lambda: b.imageHeaderTextCta('Tile E'),
+            'Tertiary Card 6': lambda: b.imageHeaderTextCta('Tile F'),
+            'Tertiary Card 7': lambda: b.imageHeaderTextCta('Tile G'),
+            'Tertiary Card 8': lambda: b.imageHeaderTextCta('Tile H'),
+            'Tertiary Card 9': lambda: b.imageHeaderTextCta('Tile I'),
+            'Tertiary Card 10': lambda: b.imageHeaderTextCta('Tile J'),
+            'Vertical Interstitial Photo (G)': lambda: b.heroImageHeaderTextCta('Tile B'),
+            'Marketing Message (H)': lambda: b.headerTextCta(),
         })
 
 
