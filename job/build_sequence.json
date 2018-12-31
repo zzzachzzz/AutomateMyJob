@@ -1,0 +1,338 @@
+[
+    [
+        {
+            "type": "image",
+            "name": "TCISI_SpaDetails_singleHeroImage",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "singleHeroImage"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "image": "tcisi-spa-eutonos-1478"
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_titleSubtitleText",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "titleSubtitleText"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "body": "Immerse in an authentic harmony and wellness haven in the south of Tenerife. Spa Eutonos is inspired in the essence of the islands where time slows down and invites to enjoy the present moment.\nElegant wood and limestone nuances combine with smooth textures creating a relaxing atmosphere. It\u2019s over 1800 m2 has interior and exterior areas, a state-of-the-arts thermal circuit and 10 treatment cabins for rituals for individuals or couples."
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "name": "TCISI_SpaDetails_heroImageHeaderTextCta_TileA",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "heroImageHeaderTextCta",
+                    "Tile A"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "image": "tcisi-spa-eutonos-5483"
+        }
+    ],
+    [
+        {
+            "type": "wrapper",
+            "name": "TCISI_SpaDetails_imageMosaicHeadingTextCta",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageMosaicHeadingTextCta",
+                    "Tile A"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "ref": [
+                "tcisi-spa-5919",
+                "tcisi-spa-eutonos-5899"
+            ]
+        },
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageMosaicHeadingTextCta_Article_Header",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageMosaicHeadingTextCta",
+                    "Tile A"
+                ],
+                [
+                    "Text Length",
+                    "MultiArticle",
+                    "Header"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "title": "Relaxing Massages"
+        },
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageMosaicHeadingTextCta_Article_Body",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageMosaicHeadingTextCta",
+                    "Tile A"
+                ],
+                [
+                    "Text Length",
+                    "MultiArticle",
+                    "Body"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "body": "At Spa Eutonos we have the treatment you need to feel better. Pamper yourself with one of our relaxing massages or let yourself experience the luxury of our wellbeing and health holistic rituals."
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_Title",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageHeaderTextCta",
+                    "Title"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "title": "Spa Services & Facilities"
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileA_Article",
+            "title": "Vitality Pool",
+            "body": "Thalasso vitality pool with hydrotherapy body jets, floor jets, reclining loungers and swan necks."
+        },
+        {
+            "type": "wrapper",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileA",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageHeaderTextCta",
+                    "Tile A"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "ref": [
+                "tcisi-spa-eutonos-5898"
+            ]
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileB_Article",
+            "title": "Relaxation Areas",
+            "body": "Inside and outside relaxation areas with several plunge pools."
+        },
+        {
+            "type": "wrapper",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileB",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageHeaderTextCta",
+                    "Tile B"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "ref": [
+                "tcisi-spa-eutonos-5482"
+            ]
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileC_Article",
+            "title": "Treatment Rooms",
+            "body": "10 treatment rooms including a double room with hammam and Jacuzzi."
+        },
+        {
+            "type": "wrapper",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileC",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "imageHeaderTextCta",
+                    "Tile C"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "ref": [
+                "tcisi-spa-eutonos-5899"
+            ]
+        }
+    ],
+    [
+        {
+            "type": "article",
+            "name": "TCISI_SpaDetails_imageHeaderTextCta_TileD_Article",
+            "title": "Additional Facilities",
+            "body": "Steam room, sauna, ice igloo and life-style showers."
+        }
+    ],
+    [
+        {
+            "type": "image",
+            "name": "TCISI_SpaDetails_heroImageHeaderTextCta_TileB",
+            "tags": [
+                [
+                    "HWS Tier 3",
+                    "Spa and Fitness",
+                    "Spa Details",
+                    "heroImageHeaderTextCta",
+                    "Tile B"
+                ],
+                [
+                    "Products Spa",
+                    "T",
+                    "TCISI",
+                    "6969696969"
+                ],
+                [
+                    "MARSHA Codes",
+                    "T",
+                    "TCISI"
+                ]
+            ],
+            "image": "tcisi-spa-eutonos-5900"
+        }
+    ]
+]

@@ -134,5 +134,7 @@ if __name__ == '__main__':
     # pprint(parsed)
     with open('job/resultSample.json', 'r') as f:
         sheets_api_response = json.load(f)
-    parsed = parse_for_content(sheets_api_response, 'TCISI')
-    pprint(parsed)
+    build_sequence = parse_for_content(sheets_api_response, 'TCISI')
+    pprint(build_sequence)
+    with open ('job/build_sequence.json', 'w') as f:
+        json.dump(build_sequence, f, indent=4)
