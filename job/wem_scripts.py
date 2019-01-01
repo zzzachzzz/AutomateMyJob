@@ -67,7 +67,7 @@ def edit_quick_actions(categories_needed: List[List[str]]) -> None:
             cell = categories_present[i].find_element_by_css_selector('td.x-grid-cell-last')
             # Check if a needed category is already present
             if cell.text in [category[-1] for category in categories_needed]:
-                categories_needed.pop(index(cell.text))
+                categories_to_add.pop(index(cell.text))
             else:
                 # Click checkbox for category removal
                 categories_present[i].find_element_by_css_selector('td.x-grid-cell-first > div > div'
