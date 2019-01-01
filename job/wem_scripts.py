@@ -6,9 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from pprint import pprint
-import colorama
-from colorama import Fore, Back, Style
-import logging
 import json
 import time
 import re
@@ -95,6 +92,92 @@ def edit_qa_helper():
     edit_quick_actions(tp.base_tags)
 
 
+def click_quick_action(index: int):
+    # Check if Quick Action bar is expanded
+    e = find_e('#vui-workspace-ribbon-quickaction')
+    if not (re.search(r'.*(vui-ribbon-selected).*', e.get_attribute('class'))):
+        e.click()
+
+    # Scroll to quick action, right click it, and select first option with KeyDown and Enter
+    e = find_e('#vui-workspace-drawer-new-quickaction > ul > li:nth-child('+str(index)+')')
+    driver.execute_script("arguments[0].scrollIntoView(true);", e)
+    e.click()
+    # Wait for load before exiting function
+    # Maybe wait_for_loading_dialog()
+
+
+def open_edit_component_dialog(component_name)
+    all_tr = wait.until(EC.presence_of_element_located(
+        (By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
+
+    i = binary_search_web_element_list(all_tr, 1, len(all_tr)-1,
+        (By.CSS_SELECTOR, 'td:nth-child(3) > div > div'),
+        component_name)
+    # Click pencil edit buttton
+    all_tr[i].find_element_by_css_selector(
+        'td:nth-child(2) > div > ul > li:nth-child(1)'
+        ).click()
+    # Wait for load before exiting function
+    # Maybe wait_for_loading_dialog()
+
+
+# TODO
+def add_categories_to_component(categories: List[List[str]]):
+    # Click categories tab
+    # Check for existing tags and compile list of tags_to_add
+    # for category in categories:
+    #     Click Add Categories
+    #     navigate_to_directory_in_sidebar(category)
+    #     add_category_from_results(category[-1])
+    # return
+
+def build_from_build_sequence():
+    with open('job/build_sequence.json', 'r') as f:
+        build_sequence = json.load(f)
+
+    for component in build_sequence:
+        if component['type'] == 'article':
+            build_article(component)
+        elif component['type'] == 'wrapper':
+            build_wrapper(component)
+        elif component['type'] == 'image':
+            build_image(component)
+        elif component['type'] == 'link':
+            build_link(component)
+
+
+
+def build_article(component: dict):
+    # ? index 2 for article, index 3 for article [M] (tags) ?
+    click_quick_action( 3 if component.get('tags') else 2 )
+
+    # Click textbox for System Name
+    e = find_e_wait(
+        'table.x-field.vui-widget-input-text.vui-field-large.x-form-item.x-field-default > input')
+    e.send_keys( component['name'] )
+    # Click Save & Exit
+    find_e('//button[@title="Save all pending changes."]'
+        ).click()
+
+    open_edit_component_dialog(component['name'])
+
+    # Add article title (gen description later in IE)
+    if component.get('title'):
+        # Click checkbox of title item
+        # Click Edit
+        # Click text box
+        # e.send_keys( component['title'] )
+        # Click Ok
+
+    # TODO create function
+    add_categories_to_component(component['tags'])
+
+    # Click Save & Exit
+    find_e('//button[@title="Save all pending changes."]'
+        ).click()
+
+
+
 # Binary search a list of web element objects for an item
 # as a string, with a selector for the item's text.
 def binary_search_web_element_list(arr: list, start: int, end: int,
@@ -113,7 +196,6 @@ def binary_search_web_element_list(arr: list, start: int, end: int,
         else:
             end = mid - 1
     return -1  # Element was not present
-# binary_search_web_element_list(arr, 1, len(arr)-1, item)
 
 
 # Find and add category from results
@@ -138,6 +220,7 @@ def add_category_from_results(item: str) -> int:
         # Click OK
         find_e('//span[contains(@id, "-button-ok-btnInnerEl")]', by=By.XPATH
             ).click()
+        # TODO Wait for load before exiting function
         return None
         # return index_of_item
 
@@ -188,6 +271,7 @@ def navigate_to_directory_in_sidebar(directory_path: List[str]) -> None:
         if directory_path.index(directory) == len(directory_path)-2:
             e = all_tr[index_of_directory].find_element(By.CSS_SELECTOR, 'td > div')
             e.click()
+            wait_for_loading_dialog()
             return
 
         e = all_tr[index_of_directory].find_elements(
@@ -231,7 +315,6 @@ class nodes_have_been_added:
 def got_em(cp):
     # cp = ['MARSHA Codes', 'N', 'NYCHW']
     navigate_to_directory_in_sidebar(cp)
-    wait_for_loading_dialog()
     add_category_from_results(cp[-1])
 
     click_all_categories_btn()  # To reset sidebar navigation
