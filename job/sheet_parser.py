@@ -12,6 +12,10 @@ def to_html():
     ''.join([s[0:5], '<b>', s[5:7], '<b>', s[7:len(s)]])
     return
 
+# Untagged articles and links that are referenced
+# by wrappers are added to the set when identified,
+# to prevent being deleted from a ref list.
+valid_refs = set()
 
 # Removes elements from components where content was not added.
 # Skips appending the component to the cleaned list if the component
@@ -28,11 +32,11 @@ def complete_build_section(build_section: List[dict], content_identifiers: Set[s
                 del cleaned_build_component['body']
             if (cleaned_build_component.get('body') or cleaned_build_component.get('title')):
                 cleaned_build_section.append(cleaned_build_component)
+                if not component.get('tags'):
+                    valid_refs.add(component['name'])
 
         elif component['type'] == 'wrapper':
-            # if not in content_identifiers or in
-            # VCMID lookup -> {TCISI_imageHeaderAsdf_Article : VCM39232ID,}
-            cleaned_build_component['ref'] = [x for x in component['ref'] if x not in content_identifiers]
+            cleaned_build_component['ref'] = [x for x in component['ref'] if (x not in content_identifiers or x in valid_refs)]
             if len(cleaned_build_component['ref']) > 0:
                 cleaned_build_section.append(cleaned_build_component)
 
