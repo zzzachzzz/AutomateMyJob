@@ -1,0 +1,34 @@
+Landing Page B
+Hotel Overview
+Map & Directions
+Rooms & Suites Overview
+Deluxe Room 1 King Bed
+Deluxe Room 2 Twin Beds
+Premium Room 1 King Bed
+Premium Room 2 Twin Beds
+Club Floor Room 1 King Bed
+Club Floor Room 2 Twin Beds
+Club Terrace Room 1 King Bed
+Club Terrace Room 2 Twin Beds
+Deluxe Suite
+Premium Suite
+Club Terrace Suite
+La Caleta Suite
+Dining Overview
+Dining Details Kamakura
+Dining Details La Venta
+Dining Details El Parador
+Dining Details Vivace Pool Rest
+Dining Details La Glorieta Lobb
+Dining Details Coral Pool Bar
+Spa & Fitness Overview
+Spa Detail
+Fitness Detail
+Area & Activities
+Meetings
+Weddings
+Offers
+Generic Subpage
+Room Details
+Dining Details
+Generic Primary Page

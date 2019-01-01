@@ -4,6 +4,7 @@ from oauth2client import file, client, tools
 from pprint import pprint
 import re
 import json
+from job import marsha, sheet_title
 
 
 # If modifying these scopes, delete the file token.json.
@@ -13,6 +14,8 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 SPREADSHEET_ID = '1H_YWddeM8KaYQf7chWodWb1zUF8tjFz2qxvoKpNYztY'
 
 
+
+
 def main():
     store = file.Storage('job/token.json')
     creds = store.get()
@@ -20,16 +23,14 @@ def main():
         flow = client.flow_from_clientsecrets('job/credentials.json', SCOPES)
         creds = tools.run_flow(flow, store)
     service = googleapiclient_build('sheets', 'v4', http=creds.authorize(Http()))
-    spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
-    spreadsheet_title = spreadsheet.get('properties').get('title')
-    marsha = get_marsha(spreadsheet_title)
-    sheets = spreadsheet.get('sheets')
-    sheet_names = get_sheet_names(sheets)
+    # spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+    # spreadsheet_title = spreadsheet.get('properties').get('title')
+    # marsha = get_marsha(spreadsheet_title)
+    # sheets = spreadsheet.get('sheets')
 
-    RANGE_NAME = generate_range_name('Spa Detail') # sheet
-    print(spreadsheet_title)
+    RANGE_NAME = generate_range_name(sheet_title) # sheet
     print(marsha)
-    print(sheet_names)
+    print(sheet_title)
     print(RANGE_NAME)
     print("\n\n\n")
     result = service.spreadsheets().values().get(
@@ -45,18 +46,6 @@ def main():
     result = sheet.values().update(spreadsheetId=SAMPLE_SPREADSHEET_ID, range=SAMPLE_RANGE_NAME,
         valueInputOption='USER_ENTERED', body=body).execute()
     """
-    values = result.get('values')
-    # Get rid of lists within the list
-    values = [x[0] if len(x) > 0 else '' for x in values]
-    pprint(values)
-    with open('job/values.pickle', 'wb') as pickle_file:
-        pickle.dump(values, pickle_file)
-    print("\n\n\n")
-
-    print("PICKLED")
-    # parsed = parse_for_content('Hotel Overview', values)
-    # pprint(parsed)
-    return
 
 
 def get_marsha(spreadsheet_title: str) -> str:
@@ -73,12 +62,32 @@ def generate_range_name(sheet: str) -> str:
     return range_name
 
 
-def get_sheet_names(sheets: list) -> list:
+def update_sheet_names():
+    store = file.Storage('job/token.json')
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('job/credentials.json', SCOPES)
+        creds = tools.run_flow(flow, store)
+    service = googleapiclient_build('sheets', 'v4', http=creds.authorize(Http()))
+    spreadsheet = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID).execute()
+    spreadsheet_title = spreadsheet.get('properties').get('title')
+    marsha = get_marsha(spreadsheet_title)
+    sheets = spreadsheet.get('sheets')
+
     sheet_names = []
     for s in sheets:
         title = s.get('properties').get('title')
         sheet_names.append(title)
-    return sheet_names
+
+    with open('job/sheet_names.txt', 'w') as f:
+        for s in sheet_names:
+            f.write(s + "\n")
+
+
+def print_sheet_names():
+    with open('job/sheet_names.txt', 'r') as f:
+        for s in f.readlines():
+            print(s)
 
 
 if __name__ == '__main__':
