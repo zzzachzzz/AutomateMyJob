@@ -3,7 +3,7 @@ import pickle
 import json
 import re
 from typing import List, Set
-from job import build
+from job import build_data
 from job import cif_names_to_build
 from job.tagging_paths import get_page_type
 
@@ -69,7 +69,7 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
 
 
 
-    b = build.Build(sheet_title, marsha)
+    b = build_data.Build(sheet_title, marsha)
     # Get the specific subclass of CIF needed based on page_type
     page_type = get_page_type(sheet_title)
     # Get subclass according to page_type, otherwise
@@ -79,6 +79,7 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
     cif = TargetClass(b)
 
     build_sequence = []
+    new_build_section = []
     content_identifiers = set()
     i = 0
     while i <= len(values)-1:
@@ -86,18 +87,18 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
             i += 1
 
         elif values[i] in cif.names:
-            if len(build_sequence) > 0:
-                build_sequence[-1] = complete_build_section(build_sequence[-1], content_identifiers)
-                # If empty list was appended, delete it
-                if len(build_sequence[-1]) == 0:
-                    del build_sequence[-1]
+            # Complete build_section before beginning next
+            if len(new_build_section) > 0:
+                new_build_section = complete_build_section(new_build_section, content_identifiers)
+                if len(new_build_section) > 0:
+                    build_sequence += new_build_section
 
-            build_sequence.append( cif.names[values[i]]() )
-            content_identifiers = get_content_identifiers(build_sequence[-1])
+            new_build_section = cif.names[values[i]]()
+            content_identifiers = get_content_identifiers(new_build_section)
             i += 1
 
         elif values[i] in content_identifiers and values[i+1] != '':
-            for component in build_sequence[-1]:
+            for component in new_build_section:
                 if component['type'] == 'article':
                     if component.get('title') == values[i]:
                         component['title'] = values[i+1]
@@ -115,23 +116,17 @@ def parse_for_content(sheets_api_response: dict, marsha: str) -> list:
 
         else:
             i += 1
-    if len(build_sequence) > 0:
-        build_sequence[-1] = complete_build_section(build_sequence[-1], content_identifiers)
-    # If empty list was appended, delete it
-    if len(build_sequence[-1]) == 0:
-        del build_sequence[-1]
+
+    # Complete last build_section
+    if len(new_build_section) > 0:
+        new_build_section = complete_build_section(new_build_section, content_identifiers)
+        if len(new_build_section) > 0:
+            build_sequence += new_build_section
 
     return build_sequence
 
 
 if __name__ == '__main__':
-    # with open('job/values.pickle', 'rb') as pickle_file:
-    #     values = pickle.load(pickle_file)
-    # pprint(values)
-    # print("\n\n")
-    # parsed = parse_for_content('Hotel Overview', 'TCISI', values)
-    # print("\n\n\nFinal:")
-    # pprint(parsed)
     with open('job/resultSample.json', 'r') as f:
         sheets_api_response = json.load(f)
     build_sequence = parse_for_content(sheets_api_response, 'TCISI')
