@@ -106,7 +106,7 @@ def click_quick_action(index: int):
     # Maybe wait_for_loading_dialog()
 
 
-def open_edit_component_dialog(component_name)
+def open_edit_component_dialog(component_name):
     all_tr = wait.until(EC.presence_of_element_located(
         (By.CSS_SELECTOR, '#vui-workspace-grid-body > div > table > tbody') ))
 
@@ -123,6 +123,7 @@ def open_edit_component_dialog(component_name)
 
 # TODO
 def add_categories_to_component(categories: List[List[str]]):
+    pass
     # Click categories tab
     # Check for existing tags and compile list of tags_to_add
     # for category in categories:
@@ -163,6 +164,7 @@ def build_article(component: dict):
 
     # Add article title (gen description later in IE)
     if component.get('title'):
+        pass
         # Click checkbox of title item
         # Click Edit
         # Click text box
